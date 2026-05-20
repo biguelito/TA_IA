@@ -1,0 +1,28 @@
+Qual é o problema que está sendo resolvido;
+R: Multiple Travelling Salesman Problem
+
+Qual algoritmo evolucionário foi utilizado e seus detalhes, incluindo:
+    R:NSGA-2
+
+    como é a representação (codificação) da população;
+    R: Tem, detalhar
+
+    quais operadores de recombinação (cruzamento) e mutação foram utilizados e suas taxas;
+    R: 
+    Cruzamento: Combined HGA, 100%
+    Mutação: Inversão e deslocamento de fragmento, 0.05%
+
+    como é realizada a seleção de pais e de sobreviventes;
+    Seleção dos pais: Torneio binario
+    Seleção dos filhos; NSGA-2
+
+    como é feito o cálculo da(s) função(ões) de aptidão e/ou dominância;
+    R: NSGA-2
+
+    quantas gerações foram utilizadas;
+    entre 1400 e 2200
+
+quais são os resultados obtidos e como eles foram comparados com os outros trabalhos.
+
+quais são as alterações planejadas no algoritmo (2a VA) e suas justificativas.
+

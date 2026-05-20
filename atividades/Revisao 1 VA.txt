@@ -1,0 +1,78 @@
+1. Explique as principais diferenças entre os algoritmos genéticos e as estratégias evolucionárias. 
+
+Na sua resposta, explique:
+
+a) quais são os parâmetros que são autoadaptados nas EEs;
+b) como ocorre a autoadaptação dos parâmetros ao longo das gerações.
+
+R:Dois pontos a destacar em que esses algoritmos diferem são:
+Representação: Inicialmente, os algoritmos geneticos buscavam representar um dado numérico em vetores binarios.
+    Hoje já é mais comum um dado numérico ser representado em sua forma original, como inteiro ou reais.
+    As estratégias evolucionárias sempre trataram os dados em vetores de valores reais
+Operadores: Os algoritmos geneticos possuem como operador principal para geração de novos individuos a recombinação de pais.
+    As estratégias evolucionárias possuem como operador principal para geração de novos individuos a mutação de um individuo.
+    Mesmo que em algoritmos geneticos exista a operação operação de mutação, ela é mais complexa em estratregias evolucionárias,
+    nela, o parametro utilizado para mutação pode ser unico para todos os valores do individuo ou podem ser utilizados varios 
+    valores para um individuo, sendo comumento utilizado n parametros de mutação para um individuo de n variaveis, numa relação
+    um-para-um. Além do uso de distintos valores de mutação, esses valores também mutam no processo de mutação antes
+    de mutação das variavel do individuo.
+
+2. A seleção via roleta pode ser considerada como uma seleção justa pois é proporcional à aptidão dos indivíduos.
+
+Porém, explique qual é a "anomalia" referente à pressão de seleção que pode ocorrer com a roleta se a população estiver com a seguinte configuração:
+
+95% dos indivíduos possuem aptidão semelhante com valor próximo à aptidão média da população, e 5% dos indivíduos possuem aptidão cujo valor é 
+aproximadamente o dobro da aptidão média da população.
+
+Portanto, os melhores indivíduos (5%) possuem o dobro da aptidão dos demais (95%). Ao realizar diversos sorteios, a probabilidade dos melhores
+indivíduos serem escolhidos também é o dobro dos demais? Por exemplo, após realizar 100 sorteios, será que aproximadamente 10 indivíduos seriam
+escolhidos dentre os "melhores" e 90 dentre os "piores"? Justifique sua resposta. Faça um exemplo de distribuição das "fatias" da roleta para os
+indivíduos (por simplicidade, agrupe todos os indivíduos "melhores" em uma região e os "piores" em outra região, assim você só precisará mostrar
+as regiões ao invés das fatias individuais).
+
+R: A seleção da roleta é justa quando analisamos a performance individual em relação a perfomance geral. Porém, ao considerar o a distribuição da
+perfomance de todos os individuos agrupando e classificando esses grupos, é possivel encontrar um desequillibrio na escolha que é prejudicial
+para a busca do melhor individuo. 
+Utilizando o cenário da questão com numeros concretos de 100 individuos, onde o grupo 1, 95 deles, tem nota 5 e o grupo 2, 5 deles, tem nota 10,
+um individuo do grupo 2 tem 10/525 chances de ser escolhido enquanto o do grupo 1 tem 5/525 chances de ser escolhido, o dobro de change pra um individuo
+do grupo 2. Porém, ao calcular a possibilidade de escolher um individuo de cada grupo, e não individualmente, o grupo tem 475/525 de chances de ser
+escolhido contra 50/525 chances do grupo. Ou seja, por mais que isoladamente um individuo possua a melhor performance, se a distribuição das perfomances
+não estiverem balanceadas globalmente, a escolha do melhor individuo não será justa, causando um comportamento anomalo no que inicialmente parecia ser
+uma escolha justa.
+
+É possivel fugir dessa anomalia fazendo a seleção por ranque ou torneio.
+Ranque: ordenação decrescente da perfomance dos individuos e atribuição da probabilidade de escolha proporcional ao ranque. Quanto melhor no ranque
+maior a chance de ser escolhido
+Torneio: São escolhido aleatoriamente k individuos para serem comparados, o melhor é escolhido
+
+3. No problema do caixeiro viajante (travelling salesman problem – TSP), o caixeiro deve visitar cada cidade em um dado território somente uma vez
+e depois retornar à cidade de origem. Dado o custo da viagem entre cada uma das N cidades, deseja-se obter o melhor itinerário que resulta no custo
+mínimo total. Explique qual é o melhor operador de cruzamento dentre os operadores a seguir para o problema do caixeiro viajante. Considere que a
+representação do indivíduo utilizará um vetor que conterá uma permutação de N números inteiros (IDs das cidades).
+
+Order 1 Crossover
+Cycle Crossover
+Edge Recombination
+Partially Mapped Crossover (PMX)
+
+R: O melhor é Edge Recombination. O caixeiro viajante é um problema onde ao estar no ponto A, o proximo ponto a viajar costuma ser o de menor custo
+partindo do A para este ponto. Com isso, manter a relação de adjacências entre os N pontos de individuo é uma forma de preservar os bons valores de
+um individuo. Dentre os operadores listados, o que melhor melhor preserva a relação de adjacência entre pontos do individuo é o Edge Recombination. 
+
+4. 
+a. Explique o conceito de dominância utilizada nos MOEAs e como é formada a fronteira de Pareto.
+R: Um individuo A dommina um individuo B quando:
+    1. A não é pior que B em nenhum objetivo
+    2. A é melhor que B em ao menos 1 objetivo
+Ao comparar um individuo A com todos os outros individuos da população e constar que esse A não é dominado por nenhum outro individuo, esse A é
+chamado de não dominado. O conjunto das soluções não dominadas de um problema é chamado de fronteira de pareto, sendo esse o conjuto das melhores
+soluções.
+
+b. Explique a diferença do espaço de variáveis para o espaço objetivo.
+R: Espaço de variáveis: Espaço das varaveis de decisão
+Espaço objetivo: Espaço dos valores das funçoes objetivo
+Ao utilizar um valor do espaço de variaveis na função objetivo, é alcançado, ou aproximado, um valor do espaço objetivo
+
+c. Os problemas multiobjetivo possuem um vetor de funções a serem otimizadas. Neste sentido, como é calculada a "nota" dos indivíduos (aptidão) no MOEA?
+R: Um método utilizado para aptidão é o ranqueamento, onde o menor é melhor. As soluções não dominadas estão no ranque 1, as soluções que são dominadas
+somente pelas soluções de ranque 1 formam o ranque 2 e assim por diante.

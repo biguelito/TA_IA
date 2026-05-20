@@ -1,0 +1,28 @@
+a) Por que a representação em árvores é mais adequada que vetores lineares em Programação Genética?
+
+R) Os problemas que se buscam resolver com Programação Genética são problemas que a representação de uma possivel solução, o cromossomo, não é linear, 
+sendo essas representações mais complexas ou possuindo hierarquias, camadas. A representação do problema também pode variar de tamanho nas suas dimensões
+durante a execução, onde também é mais cabivel uma representação em árvore.
+Além da representação, a manipulação de uma árvore tratando um ponto dela e sua árvore subsquente como uma sub árvore dá mais versatilidade para a manipulação de 
+pedaços da solução sem comprometer a representação da solução.
+
+b) Explique o fenômeno de bloat (inchaço). Por que ele é problemático?
+
+R) Bloat é o crescimento excessivo das árvores durante a passagem das gerações.
+Algumas arvores podem alcançar tamanhos maiores e produzir um fitness que poderia ser alcançado por arvores menores, fazendo com que o aumento em tamanho não
+possua reais ganhos para a solução. Além disso, manipular e armazenar uma arvore possui um custo operacional, uma árvore maior possui maiores custos e no cenario
+de uma árvore "bloated", que possui um tamanho maior sem um ganho real ou proporcional ao seu tamanho, essa árvore além de não ser eficiente prejudica a execução
+do algoritmo no geral.  
+
+c) Cite duas estratégias para controlar o bloat e explique como elas funcionam.
+ 
+R) Pressão de parsimônia: Penalizar o fitness de árvores grandes demais, acima de um limite. Independente da técnica de penalização, o objetivo é de favorecer no
+cálculo do fitness árvores que vão até determinado tamanho.
+Limitação de árvore: Limitar o crescimento da árvore em alguma dimensão, como na quantidade de nós ou profundidade máxima.
+
+d) Em GP, por que muitas vezes se utiliza cruzamento OU mutação, ao invés de aplicar os dois operadores sequencialmente como em Algoritmos Genéticos?
+
+R) Árvores são estruturas mais complexas e custosas de manipular em comparação a representações lineares de algoritmos geneticos, por consequência, o custo de aplicar
+as operações de combinação e mutação em sequência na mesma representação torna-se bastante custoso computacionalmente, sendo por isso preferivel evitar.
+Além desse custo, essas duas operações aplicadas em sequência numa árvore, principalmente a mutação, podem alterar demais uma representação, além do desejado.
+Por isso, é aplicado somente uma das operações de forma probabilistica, onde o cruzamento é comumente preferenciado.
