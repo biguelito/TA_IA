@@ -1,3 +1,5 @@
+https://www.tandfonline.com/doi/full/10.1080/21642583.2019.1674220#d1e889
+
 Qual é o problema que está sendo resolvido;
 R: Multiple Travelling Salesman Problem
 
