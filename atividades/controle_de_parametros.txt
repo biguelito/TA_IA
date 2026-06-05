@@ -1,0 +1,13 @@
+Explique as diferenças entre o controle de parâmetros determinístico,
+adaptativo e auto adaptativo.
+
+R: 
+Determinístico: Uma função é atribuida previamente, onde com ela é possivel calcular, inclusive previamente, o valor 
+    do parametro. A variável da função geralmente é o número atual da população.
+
+Adaptativos: Está relacionado ao resultado do processo de busca na geração. Não é possivel calcular previamente
+    por consequencia da sua vinculação ao retorno do processo de busca de cada geração. Calculado geralmente com
+    valores estatiscos referente as populações, mas pode utilizar valores referentes ao fitness dos individuos.
+
+Auto adaptativos: Está relacionado aos individuos, por cada individuo, evoluindo em conjunto com eles. Calculado geralmente
+    com valores referentes ao fitness dos individuos.
