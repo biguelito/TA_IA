@@ -1,7 +1,7 @@
 import random
 import tsplib95
 
-def create_initial_population(qp):
+def create_initial_population(population_size, gene_size, salesman):
     return [[0] * qp]
 
 def binary_tournament_selection():
@@ -10,13 +10,13 @@ def binary_tournament_selection():
 def crossover (crossover_set):
     return crossover_set
 
-def mutation1(pk):
+def mutation_inversion(pk):
     return pk
 
-def mutation2(pk):
+def mutation_fragment(pk):
     return pk
 
-def fastNonDominatedSort(ri):
+def fast_non_dominated_sort(ri):
     return [ri[:len(ri)//2] , ri[len(ri)//2:]]
 
 def crowding_distance_assignment(fj):
@@ -25,51 +25,54 @@ def crowding_distance_assignment(fj):
 def sort(fj):
     return
 
-def NSGA2(p0, n, mp):
+def NSGA2(population_0, iterations, mutation_probability):
     pn = None
-    i = 0
-    pi = p0
-    while i < n:
-        crossover_set = binary_tournament_selection(pi)
-        qi = crossover(crossover_set)
+    population_size = len(population_0)
+    iteration_counter = 0
+    population_iteration = population_0
+    while iteration_counter < iterations:
+        population_crossover = binary_tournament_selection(population_iteration)
+        population_childs = crossover(population_crossover)
         
-        for pk in qi:
-            if (random.uniform(0, 1) <= mp):
-                pk_muted = None
+        for child in population_childs:
+            if (random.uniform(0, 1) <= mutation_probability):
+                child_mutated = None
                 if (random.uniform(0, 1) <= 0.5): 
-                    pk_muted = mutation1(pk)
+                    child_mutated = mutation_inversion(child)
                 else:
-                    pk_muted = mutation2(pk)
-            pk = pk_muted
+                    child_mutated = mutation_fragment(child)
+            child = child_mutated
 
-        ri = pi + qi
-        f = fastNonDominatedSort(ri)
+        population_complete = population_iteration + population_childs
+        population_ranked = fast_non_dominated_sort(population_complete)
 
-        pii, j =  [], 0
-        while len(pii) + len(f) <= len(p0):
-            pii.append(f[j])
-            j += 1
+        population_next_interation = []
+        rank = 0
+        while len(population_next_interation) + len(population_ranked) <= len(population_size):
+            population_next_interation.append(population_ranked[rank])
+            rank += 1
 
-        fj = crowding_distance_assignment(f[j])
-        fj = sort(fj)
-        pii += fj[0 : (len(p0) - len(pii))]
+        rank_sorted_crowding_distance = crowding_distance_assignment(population_ranked[rank])
+        rank_sorted_crowding_distance = sort(rank_sorted_crowding_distance)
+        population_next_interation += rank_sorted_crowding_distance[0 : (len(population_size) - len(population_next_interation))]
+        population_iteration = list(population_next_interation)
+        iteration_counter += 1
 
-        i += 1
-
-    return pn
+    return population_iteration
 
 def load_problem(name, qtsp):
     problem = tsplib95.load(f"problems/{name}.tsp")
-    return problem, len(list(problem.get_nodes())) + (qtsp-1)
+    gene_size = len(list(problem.get_nodes())) + (qtsp-1)
+    return problem, gene_size
 
 if __name__ == "__main__":
-    problem = load_problem("eil51", 7)
+    salesman = 7
+    problem, gene_size = load_problem("eil51", salesman)
+    population_size = 100
+    mutation_probability = 0.05
+    iterations = 10
 
-    qp = 100
-    mp = 0.05
-    n = 1000 
-
-    p0 = create_initial_population(qp)
-    # pn = NSGA2(p0, n, mp)
+    population_0 = create_initial_population(population_size, gene_size, salesman)
+    pn = NSGA2(population_0, iterations, mutation_probability)
 
     print(problem.get_weight(1,2))
