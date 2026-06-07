@@ -1,8 +1,26 @@
 import random
 import tsplib95
 
-def create_initial_population(population_size, gene_size, salesman):
-    return [[0] * qp]
+def create_random_salesman_division(salesman, nodes_quantity):
+    division = []
+    last_salesman = 0
+    for div in range(salesman-1):
+        position = random.randint(last_salesman+1, nodes_quantity-salesman+div+1)
+        last_salesman = position
+        division.append(position)
+    return division
+
+def create_random_chomossome(population_size, nodes, salesman, nodes_quantity):
+    path = random.sample(nodes, k=len(nodes))
+    division = create_random_salesman_division(salesman, nodes_quantity)
+    return path + division
+
+def create_initial_population(population_size, nodes, salesman):
+    population_0 = []
+    nodes_quantity = len(nodes)
+    for i in range(population_size):
+        population_0.append(create_random_chomossome(population_size, nodes, salesman, nodes_quantity))
+    return population_0
 
 def binary_tournament_selection():
     return
@@ -16,8 +34,8 @@ def mutation_inversion(pk):
 def mutation_fragment(pk):
     return pk
 
-def fast_non_dominated_sort(ri):
-    return [ri[:len(ri)//2] , ri[len(ri)//2:]]
+def fast_non_dominated_sort(population):
+    return [population[:len(population)//2] , population[len(population)//2:]]
 
 def crowding_distance_assignment(fj):
     return fj
@@ -25,8 +43,7 @@ def crowding_distance_assignment(fj):
 def sort(fj):
     return
 
-def NSGA2(population_0, iterations, mutation_probability):
-    pn = None
+def NSGA2(population_0, iterations, mutation_probability, salesman):
     population_size = len(population_0)
     iteration_counter = 0
     population_iteration = population_0
@@ -62,17 +79,28 @@ def NSGA2(population_0, iterations, mutation_probability):
 
 def load_problem(name, qtsp):
     problem = tsplib95.load(f"problems/{name}.tsp")
-    gene_size = len(list(problem.get_nodes())) + (qtsp-1)
-    return problem, gene_size
+    return problem
+
+def print_chromossome(chromossome, salesman):
+    division_quantity = salesman-1
+    path = chromossome[0 : -division_quantity]
+    division = chromossome[-division_quantity :]
+    start = 0
+    for i in range(salesman-1):
+        div = division[i]
+        print(f"{i}: 0 - {' - '.join(str(chro) for chro in path[start : div])} - 0")
+        start = div
+    print(f"{i+1}: 0 - {' - '.join(str(chro) for chro in path[start : ])} - 0")
+
 
 if __name__ == "__main__":
     salesman = 7
-    problem, gene_size = load_problem("eil51", salesman)
-    population_size = 100
+    problem = load_problem("eil51", salesman)
+    gene_size = len(list(problem.get_nodes())) + (salesman-1)
+    population_size = 1
     mutation_probability = 0.05
     iterations = 10
 
-    population_0 = create_initial_population(population_size, gene_size, salesman)
-    pn = NSGA2(population_0, iterations, mutation_probability)
+    population_0 = create_initial_population(population_size, list(problem.get_nodes()), salesman)
 
-    print(problem.get_weight(1,2))
+    # pn = NSGA2(population_0, iterations, mutation_probability, salesman)
