@@ -2,6 +2,7 @@ import random
 import tsplib95
 
 from individual import Individual
+from nsga2 import NSGA2
 
 def create_initial_population(population_size, nodes, salesman):
     population_0 = []
@@ -33,7 +34,7 @@ def crowding_distance_assignment(fj):
 def sort(fj):
     return
 
-def NSGA2(population_0, iterations, mutation_probability, salesman):
+def pseudo_NSGA2(population_0, iterations, mutation_probability):
     population_size = len(population_0)
     iteration_counter = 0
     population_iteration = population_0
@@ -67,18 +68,21 @@ def NSGA2(population_0, iterations, mutation_probability, salesman):
 
     return population_iteration
 
-def load_problem(name, qtsp):
+def load_problem(name):
     problem = tsplib95.load(f"problems/{name}.tsp")
     return problem
 
 if __name__ == "__main__":
+    problem = load_problem("eil51")
+    
     salesman = 7
-    problem = load_problem("eil51", salesman)
     gene_size = len(list(problem.get_nodes())) + (salesman-1)
-    population_size = 1
+    population_size = 10
     mutation_probability = 0.05
     iterations = 10
 
     population_0 = create_initial_population(population_size, list(problem.get_nodes()), salesman)
-    print(population_0[0].chromossome)
-    # pn = NSGA2(population_0, iterations, mutation_probability, salesman)
+    nsga2 = NSGA2()
+    ranks = nsga2.fast_non_dominated_sort(population_0)
+    print(ranks)
+   
