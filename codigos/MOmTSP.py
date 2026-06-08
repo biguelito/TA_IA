@@ -1,25 +1,15 @@
 import random
 import tsplib95
 
-def create_random_salesman_division(salesman, nodes_quantity):
-    division = []
-    last_salesman = 0
-    for div in range(salesman-1):
-        position = random.randint(last_salesman+1, nodes_quantity-salesman+div+1)
-        last_salesman = position
-        division.append(position)
-    return division
-
-def create_random_chomossome(population_size, nodes, salesman, nodes_quantity):
-    path = random.sample(nodes, k=len(nodes))
-    division = create_random_salesman_division(salesman, nodes_quantity)
-    return path + division
+from individual import Individual
 
 def create_initial_population(population_size, nodes, salesman):
     population_0 = []
     nodes_quantity = len(nodes)
-    for i in range(population_size):
-        population_0.append(create_random_chomossome(population_size, nodes, salesman, nodes_quantity))
+    for _ in range(population_size):
+        individual = Individual(salesman, nodes_quantity)
+        individual.create_random(nodes)
+        population_0.append(individual)
     return population_0
 
 def binary_tournament_selection():
@@ -81,18 +71,6 @@ def load_problem(name, qtsp):
     problem = tsplib95.load(f"problems/{name}.tsp")
     return problem
 
-def print_chromossome(chromossome, salesman):
-    division_quantity = salesman-1
-    path = chromossome[0 : -division_quantity]
-    division = chromossome[-division_quantity :]
-    start = 0
-    for i in range(salesman-1):
-        div = division[i]
-        print(f"{i}: 0 - {' - '.join(str(chro) for chro in path[start : div])} - 0")
-        start = div
-    print(f"{i+1}: 0 - {' - '.join(str(chro) for chro in path[start : ])} - 0")
-
-
 if __name__ == "__main__":
     salesman = 7
     problem = load_problem("eil51", salesman)
@@ -102,5 +80,5 @@ if __name__ == "__main__":
     iterations = 10
 
     population_0 = create_initial_population(population_size, list(problem.get_nodes()), salesman)
-
+    print(population_0[0].chromossome)
     # pn = NSGA2(population_0, iterations, mutation_probability, salesman)
