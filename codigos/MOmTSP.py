@@ -1,15 +1,15 @@
 import random
-import tsplib95
 
 from individual import Individual
 from nsga2 import NSGA2
+from problem import Problem
 
-def create_initial_population(population_size, nodes, salesman):
+def create_initial_population(population_size : int, problem : Problem):
     population_0 = []
-    nodes_quantity = len(nodes)
     for _ in range(population_size):
-        individual = Individual(salesman, nodes_quantity)
-        individual.create_random(nodes)
+        individual = Individual()
+        individual.create_random(problem)
+        individual.set_functions(*problem.calculate_functions(individual))
         population_0.append(individual)
     return population_0
 
@@ -68,21 +68,18 @@ def pseudo_NSGA2(population_0, iterations, mutation_probability):
 
     return population_iteration
 
-def load_problem(name):
-    problem = tsplib95.load(f"problems/{name}.tsp")
-    return problem
-
 if __name__ == "__main__":
-    problem = load_problem("eil51")
+    salesman_quantity = 7
+    problem = Problem("eil51", salesman_quantity)
     
-    salesman = 7
-    gene_size = len(list(problem.get_nodes())) + (salesman-1)
-    population_size = 10
+    gene_size = len(problem.nodes) + (salesman_quantity-1)
+    population_size = 100
     mutation_probability = 0.05
     iterations = 10
 
-    population_0 = create_initial_population(population_size, list(problem.get_nodes()), salesman)
+    population_0 = create_initial_population(population_size, problem)
     nsga2 = NSGA2()
     ranks = nsga2.fast_non_dominated_sort(population_0)
-    print(ranks)
+    for i, rank in enumerate(ranks):
+        print(f"{i}: {len(rank)}")
    
