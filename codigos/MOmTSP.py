@@ -4,37 +4,7 @@ from individual import Individual
 from nsga2 import NSGA2
 from problem import Problem
 
-def create_initial_population(population_size : int, problem : Problem):
-    population_0 = []
-    for _ in range(population_size):
-        individual = Individual()
-        individual.create_random(problem)
-        # individual.set_functions(*problem.calculate_functions(individual))
-        population_0.append(individual)
-    return population_0
-
-def binary_tournament_selection():
-    return
-
-def crossover (crossover_set):
-    return crossover_set
-
-def mutation_inversion(pk):
-    return pk
-
-def mutation_fragment(pk):
-    return pk
-
-def fast_non_dominated_sort(population):
-    return [population[:len(population)//2] , population[len(population)//2:]]
-
-def crowding_distance_assignment(fj):
-    return fj
-
-def sort(fj):
-    return
-
-def pseudo_NSGA2(population_0, iterations, mutation_probability):
+def pseudo_code(population_0, iterations, mutation_probability):
     population_size = len(population_0)
     iteration_counter = 0
     population_iteration = population_0
@@ -67,6 +37,36 @@ def pseudo_NSGA2(population_0, iterations, mutation_probability):
         iteration_counter += 1
 
     return population_iteration
+
+def create_initial_population(population_size : int, problem : Problem):
+    population_0 = []
+    for _ in range(population_size):
+        individual = Individual()
+        individual.create_random(problem)
+        # individual.set_functions(*problem.calculate_functions(individual))
+        population_0.append(individual)
+    return population_0
+
+def binary_tournament_selection():
+    return
+
+def crossover (crossover_set):
+    return crossover_set
+
+def mutation_inversion(pk):
+    return pk
+
+def mutation_fragment(pk):
+    return pk
+
+def fast_non_dominated_sort(population):
+    return [population[:len(population)//2] , population[len(population)//2:]]
+
+def crowding_distance_assignment(fj):
+    return fj
+
+def sort(fj):
+    return
 
 def print_ranks(ranks):
     for i, rank in enumerate(ranks):
