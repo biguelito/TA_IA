@@ -1,0 +1,37 @@
+O Balanço entre Exploração e Explotação nas Variações de Busca Local
+​
+O uso de busca local atuando sobre os descendentes (offspring) pode ser compreendido como um "aprendizado ao longo da vida" (lifetime learning). 
+A aplicação dessa busca local possui variações estruturais, podendo ser direcionada a toda a população, apenas aos melhores, ou apenas aos 
+piores indivíduos. Na teoria de Algoritmos Evolucionários, existe um balanço crítico entre Exploração (busca global por novas e diversas 
+regiões do espaço) e Explotação (refinamento local sistemático focado no entorno de boas soluções). Com base nisso, proponha e fundamente
+teoricamente o design de um Algoritmo Memético onde o alvo da busca local se altera dinamicamente ao longo das gerações. Em sua argumentação,
+responda obrigatoriamente:
+
+​Por que, nas gerações iniciais , direcionar a busca local exclusivamente aos piores indivíduos atua em favor da Exploração global e da
+diversidade, mitigando os riscos de convergência prematura precoce?
+
+​Por que a política deve ser invertida para focar estritamente nos melhores indivíduos quando o algoritmo entra em sua fase final (endgame)?
+Relacione a necessidade absoluta de Explotação nesse estágio com o conceito de conjunto de pontos alcançáveis na vizinhança N(x).
+
+R: Este design será focado no problema que estou resolvendo para a cadeira, MTSP multi objetivo.
+A estrutura principal desse design será a do NSGA-II, com seleção por dominância de Pareto, crowding distance e elitismo.
+O design do algoritmo memetico consiste em adicionar uma etapa de busca local a cada geração de uma nova população. 
+Conforme proposta de melhoria do trabalho, busca-se encontrar soluções com uma minimização melhor no balanceamento entre
+as rotas dos caixieros de uma solução, ou seja, no segundo objetivo do problema. Para isso, serão utilizando operadores como
+realocação de cidades da rota mais longa para a rota mais curta, troca de cidades entre rotas e 2-opt dentro das rotas para
+recuperar qualidade no custo total.
+
+Essa busca será aplicada dinamicamente, sendo dividida em 3 etapas relativas a quantas populações já foram geradas.
+Nas populações iniciais serão aplicadas buscas locais nos piores individuos, nas populações intermediarias serão considerados
+um misto de individuos ruins, bons, e mais alguns individuos escolhidos aleatoriamente, nas populações finais serão escolhidos
+individuos bons. O que define a qualidade de um individuos, além do rank de pareto e distancia da população, é também o
+desbalanceamento entre as rotas da solução, o valor da segunda função.
+
+Nas gerações iniciais, direcionar a busca local aos piores indivíduos favorece a exploração global porque impede que o algoritmo
+concentre cedo demais seu esforço apenas nas soluções inicialmente boas, visto que essas soluções boas podem ir de encontro a um
+conjunto otimo local mas não otimo global.
+
+Na fase final, a política deve ser invertida para focar estritamente nos melhores indivíduos porque o algoritmo entra em um estágio de explotação,
+no qual o objetivo principal deixa de ser descobrir regiões novas e passa a ser refinar as melhores soluções já encontradas. Nesse momento, 
+os indivíduos de melhor rank tendem a estar próximos da fronteira de Pareto, e sua vizinhança (N(x)), isto é, o conjunto de soluções alcançáveis
+por pequenos movimentos locais a partir de uma solução (x), possui maior probabilidade de conter soluções ainda melhores ou não dominadas.
