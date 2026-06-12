@@ -9,7 +9,7 @@ def create_initial_population(population_size : int, problem : Problem):
     for _ in range(population_size):
         individual = Individual()
         individual.create_random(problem)
-        individual.set_functions(*problem.calculate_functions(individual))
+        # individual.set_functions(*problem.calculate_functions(individual))
         population_0.append(individual)
     return population_0
 
@@ -68,6 +68,14 @@ def pseudo_NSGA2(population_0, iterations, mutation_probability):
 
     return population_iteration
 
+def print_ranks(ranks):
+    for i, rank in enumerate(ranks):
+        print(f"rank {i+1}: {len(rank)} individuos")
+        individual : Individual
+        for individual in rank:
+            print(f"{individual.rank} - {individual.crowding_distance} | f1 {individual.total_distance} - f2 {individual.difference_longest_shortest}", end=" | ")
+            print(f"cost per path {' - '.join(str(t) for t in individual.total_per_salesman)}")
+
 if __name__ == "__main__":
     salesman_quantity = 7
     problem = Problem("eil51", salesman_quantity)
@@ -80,6 +88,4 @@ if __name__ == "__main__":
     population_0 = create_initial_population(population_size, problem)
     nsga2 = NSGA2()
     ranks = nsga2.fast_non_dominated_sort(population_0)
-    for i, rank in enumerate(ranks):
-        print(f"{i}: {len(rank)}")
-   
+    print_ranks(ranks)
