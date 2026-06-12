@@ -43,7 +43,6 @@ def create_initial_population(population_size : int, problem : Problem):
     for _ in range(population_size):
         individual = Individual()
         individual.create_random(problem)
-        # individual.set_functions(*problem.calculate_functions(individual))
         population_0.append(individual)
     return population_0
 
@@ -81,11 +80,13 @@ if __name__ == "__main__":
     problem = Problem("eil51", salesman_quantity)
     
     gene_size = len(problem.nodes) + (salesman_quantity-1)
-    population_size = 100
+    population_size = 10
     mutation_probability = 0.05
     iterations = 10
 
     population_0 = create_initial_population(population_size, problem)
     nsga2 = NSGA2()
     ranks = nsga2.fast_non_dominated_sort(population_0)
+    for rank in ranks:
+        nsga2.crowding_distance(rank)
     print_ranks(ranks)
