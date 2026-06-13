@@ -8,11 +8,13 @@ class Population:
         self.actual_generation = 0
         self.actual_population : list[Individual]
         self.actual_population = None
+        self.actual_childs : list[Individual]
+        self.actual_childs = None
 
     def create_initial_population(self, problem : Problem) -> list[Individual]:
         population_0 = []
         for _ in range(self.population_size):
-            individual = Individual()
-            individual.create_random(problem)
+            individual = Individual(problem)
+            individual.create_random()
             population_0.append(individual)
         self.actual_population = population_0

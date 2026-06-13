@@ -13,6 +13,7 @@ class MOmTSP:
         self.problem = problem        
         self.mutation_probability = mutation_probability
         self.population = Population(iterations, population_size)
+        self.common_operators = CommonOperators(problem)
 
     def start_problem(self):
         self.population.create_initial_population(self.problem)
@@ -23,10 +24,11 @@ class MOmTSP:
 
     def solve(self):
         ranks = self.start_problem()
-        NSGA2.print_ranks(ranks)
-        iteration_counter = 0
-
-        population_for_crossover = CommonOperators.binary_tournament_selection(self.population.actual_population)
-        print(population_for_crossover)
+        # NSGA2.print_ranks(ranks)
+        for i in range(self.population.generations):
+            population_for_crossover = self.common_operators.binary_tournament_selection(self.population.actual_population)
+            population_childs = self.common_operators.crossover(population_for_crossover)
+            print(population_for_crossover)
+            print(population_childs)
 
         # while iteration_counter < self.population.generations:
