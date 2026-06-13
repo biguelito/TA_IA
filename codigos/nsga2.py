@@ -1,9 +1,6 @@
 from individual import Individual
 
 class NSGA2:
-    def __init__():
-        pass
-
     def a_dominates_b(a : Individual, b : Individual):
         better_or_equal_every = (
             a.total_distance <= b.total_distance 

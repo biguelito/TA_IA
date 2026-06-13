@@ -77,4 +77,8 @@ class Individual:
             start = end
 
     def __str__(self):
-        return ' - '.join(str(chro) for chro in self.paths)
+        return '-'.join(str(chro) for chro in self.paths)
+    
+    def __repr__(self):
+        return f"({self.total_distance},{self.difference_longest_shortest})"
+        
