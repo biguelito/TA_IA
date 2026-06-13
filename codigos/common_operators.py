@@ -54,7 +54,7 @@ class CommonOperators:
         father_a = copy.deepcopy(a.paths)
         father_b = copy.deepcopy(b.paths)
 
-        city = random.sample(father_a, k=1)
+        city = random.sample(father_a, k=1)[0]
         child_paths = [city]
         while len(father_a) > 1:
             next_a = self.__next_city(father_a, city)
@@ -69,8 +69,7 @@ class CommonOperators:
                 city = next_b
             child_paths.append(city)
             
-
-        return a, b
+        return child_paths
 
     def __crossover_decodified(self, a : Individual, b : Individual):
         return a, b
