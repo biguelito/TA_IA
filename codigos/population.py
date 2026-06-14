@@ -18,3 +18,16 @@ class Population:
             individual.create_random()
             population_0.append(individual)
         self.actual_population = population_0
+
+    def prepare_next_generation(self, next_population : list[Individual]):
+        self.actual_population = next_population
+        self.actual_childs = None
+        self.actual_generation += 1
+
+    @property
+    def result_individuals(self):
+        return [indv for indv in self.actual_population if indv.rank == 1]
+
+    @property
+    def population_complete(self):
+        return self.actual_population + self.actual_childs

@@ -17,7 +17,7 @@ class NSGA2:
 
         return better_or_equal_every and better_least_one
     
-    def fast_non_dominated_sort(self, population : list[Individual]):
+    def fast_non_dominated_sort(self, population : list[Individual]) -> list[list[Individual]]:
         ranks = [[]]
         for a in population:
             for b in population:

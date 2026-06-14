@@ -100,7 +100,7 @@ class Individual:
         return '-'.join(str(chro) for chro in self.paths)
     
     def __repr__(self):
-        return f"({self.total_distance},{self.difference_longest_shortest})"
+        return f"({self.total_distance},{self.difference_longest_shortest},{self.rank},{self.crowding_distance})"
 
     def print_paths(self):
         start = 0
