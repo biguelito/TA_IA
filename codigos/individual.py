@@ -32,21 +32,6 @@ class Individual:
         self.__calculate_paths_cost()
         self.__calculate_functions()
 
-    def create_random(self):
-        self.paths = random.sample(self.problem.nodes, k=self.problem.nodes_quantity)
-        self.divisions = self.__create_random_salesman_division()
-        self.__create_costs()
-
-    def create_crossover(self, paths, divisions):
-        self.paths = paths
-        self.divisions = divisions
-        self.__create_costs()
-
-    def create_crossover_random_divisions(self, paths):
-        self.paths = paths
-        self.divisions = self.__create_random_salesman_division()
-        self.__create_costs()
-
     def __calculate_paths_cost(self):
         for path in self.salesman_paths:
             self.total_per_salesman.append(self.__path_cost(path))
@@ -70,6 +55,35 @@ class Individual:
             cost += self.problem.instance.get_weight(salesman_path_complete[point], salesman_path_complete[point+1])
         return cost
 
+    def create_random(self):
+        self.paths = random.sample(self.problem.nodes, k=self.problem.nodes_quantity)
+        self.divisions = self.__create_random_salesman_division()
+        self.__create_costs()
+
+    def create_crossover(self, paths, divisions):
+        self.paths = paths
+        self.divisions = divisions
+        self.__create_costs()
+
+    def create_crossover_random_divisions(self, paths):
+        self.paths = paths
+        self.divisions = self.__create_random_salesman_division()
+        self.__create_costs()
+
+    def mutation_inversion(self):
+        pos_1 = random.randint(0, len(self.paths)-2)
+        pos_2 = random.randint(pos_1, len(self.paths)-1)
+        self.paths = self.paths[: pos_1] + list(reversed(self.paths[pos_1 : pos_2])) + self.paths[pos_2 :]
+        self.divisions = self.__create_random_salesman_division()
+        return 
+
+    def mutation_transposition(self):
+        pos_1 = random.randint(0, len(self.paths)-2)
+        pos_2 = random.randint(pos_1, len(self.paths)-1)
+        self.paths = self.paths[pos_1 : pos_2] + self.paths[: pos_1] + self.paths[pos_2 :]
+        self.divisions = self.__create_random_salesman_division()
+        return
+        
     @property    
     def chromossome(self):
         return self.paths + self.divisions
@@ -82,16 +96,15 @@ class Individual:
             complete_path += path
         return complete_path
 
+    def __str__(self):
+        return '-'.join(str(chro) for chro in self.paths)
+    
+    def __repr__(self):
+        return f"({self.total_distance},{self.difference_longest_shortest})"
+
     def print_paths(self):
         start = 0
         ends = self.divisions + [len(self.paths)]
         for i,end in enumerate(ends):
             print(f"{i}: {self.problem.first_node} - {' - '.join(str(chro) for chro in self.paths[start : end])} - {self.problem.first_node}")
             start = end
-
-    def __str__(self):
-        return '-'.join(str(chro) for chro in self.paths)
-    
-    def __repr__(self):
-        return f"({self.total_distance},{self.difference_longest_shortest})"
-        

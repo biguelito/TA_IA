@@ -35,14 +35,6 @@ class CommonOperators:
     def __rearrange_in_par(self, full_population : list[Individual]):
         return [(full_population[i], full_population[i+1]) for i in range(0, len(full_population), 2)]
 
-    def binary_tournament_selection(self, population : list[Individual]):
-        random_arragement_first_half = random.sample(population, k=len(population))
-        selection_first_half = self.__binary_tournament(random_arragement_first_half)
-        random_arragement_second_half = random.sample(population, k=len(population))
-        selection_second_half = self.__binary_tournament(random_arragement_second_half)
-        full_population = selection_first_half + selection_second_half
-        return self.__rearrange_in_par(full_population)
-
     def __next_city(self, paths, city):
         position = paths.index(city)
         if position == len(paths)-1:
@@ -98,6 +90,14 @@ class CommonOperators:
         child.create_crossover_random_divisions(child_paths)
 
         return child
+
+    def binary_tournament_selection(self, population : list[Individual]):
+        random_arragement_first_half = random.sample(population, k=len(population))
+        selection_first_half = self.__binary_tournament(random_arragement_first_half)
+        random_arragement_second_half = random.sample(population, k=len(population))
+        selection_second_half = self.__binary_tournament(random_arragement_second_half)
+        full_population = selection_first_half + selection_second_half
+        return self.__rearrange_in_par(full_population)
 
     def crossover(self, fathers_population : list[tuple[Individual, Individual]]) -> list[Individual]:
         childs = []

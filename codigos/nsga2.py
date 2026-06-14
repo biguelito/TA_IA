@@ -1,7 +1,10 @@
 from individual import Individual
 
 class NSGA2:
-    def a_dominates_b(a : Individual, b : Individual):
+    def __init__(self):
+        pass
+
+    def __a_dominates_b(self, a : Individual, b : Individual):
         better_or_equal_every = (
             a.total_distance <= b.total_distance 
             and a.difference_longest_shortest <= b.difference_longest_shortest
@@ -14,16 +17,16 @@ class NSGA2:
 
         return better_or_equal_every and better_least_one
     
-    def fast_non_dominated_sort(population : list[Individual]):
+    def fast_non_dominated_sort(self, population : list[Individual]):
         ranks = [[]]
         for a in population:
             for b in population:
                 if a is b:
                     continue
 
-                if NSGA2.a_dominates_b(a, b):
+                if self.__a_dominates_b(a, b):
                     a.dominated_solutions.append(b)
-                elif NSGA2.a_dominates_b(b, a):
+                elif self.__a_dominates_b(b, a):
                     a.domination_count += 1
 
             if a.domination_count == 0:
@@ -47,7 +50,7 @@ class NSGA2:
         ranks.pop()
         return ranks
     
-    def crowding_distance(rank : list[Individual]):
+    def crowding_distance(self, rank : list[Individual]):
         if len(rank) == 0:
             return
 
