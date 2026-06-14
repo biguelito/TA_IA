@@ -50,10 +50,7 @@ class CommonOperators:
 
         return paths[position+1]
 
-    def __crossover_codified(self, a : Individual, b : Individual):
-        father_a = copy.deepcopy(a.paths)
-        father_b = copy.deepcopy(b.paths)
-
+    def __crossover_operator(self, father_a : list[int], father_b : list[int]):
         city = random.sample(father_a, k=1)[0]
         child_paths = [city]
         while len(father_a) > 1:
@@ -71,25 +68,36 @@ class CommonOperators:
             
         return child_paths
 
-    def __crossover_decodified(self, a : Individual, b : Individual):
-        return a, b
-
     def __choose_division_randoms(self, a : Individual, b : Individual):
         if (random.uniform(0, 1) <= 0.5): 
             return a.divisions
         else:
             return b.divisions
 
+    def __rationalize_complete_path(self, complete_path):
+        return [city for city in complete_path if city != self.problem.first_node]
+
     def __crossover_first_child(self, a : Individual, b : Individual) -> Individual:
-        child_paths = self.__crossover_codified(a, b)
+        a_paths = copy.deepcopy(a.paths)
+        b_paths = copy.deepcopy(b.paths)
+        
+        child_paths = self.__crossover_operator(a_paths, b_paths)
         child_division = self.__choose_division_randoms(a, b)
         child = Individual(self.problem)
         child.create_crossover(child_paths, child_division)
 
-        return child_paths + child_division
+        return child
 
     def __crossover_second_child(self, a : Individual, b : Individual) -> Individual:
-        return a
+        a_complete_paths = copy.deepcopy(a.decodified_paths)
+        b_complete_paths = copy.deepcopy(b.decodified_paths)
+
+        child_paths = self.__crossover_operator(a_complete_paths, b_complete_paths)
+        child_paths = self.__rationalize_complete_path(child_paths)
+        child = Individual(self.problem)
+        child.create_crossover_random_divisions(child_paths)
+
+        return child
 
     def crossover(self, fathers_population : list[tuple[Individual, Individual]]) -> list[Individual]:
         childs = []

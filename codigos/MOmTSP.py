@@ -30,5 +30,3 @@ class MOmTSP:
             population_childs = self.common_operators.crossover(population_for_crossover)
             print(population_for_crossover)
             print(population_childs)
-
-        # while iteration_counter < self.population.generations:
