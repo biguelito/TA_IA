@@ -27,7 +27,9 @@ class Individual:
             division.append(position)
         return division
 
-    def __create_costs(self):
+    def __calculate_costs(self):
+        self.total_per_salesman = []
+        self.salesman_paths = []
         self.__separate_salemans()
         self.__calculate_paths_cost()
         self.__calculate_functions()
@@ -58,23 +60,24 @@ class Individual:
     def create_random(self):
         self.paths = random.sample(self.problem.nodes, k=self.problem.nodes_quantity)
         self.divisions = self.__create_random_salesman_division()
-        self.__create_costs()
+        self.__calculate_costs()
 
     def create_crossover(self, paths, divisions):
         self.paths = paths
         self.divisions = divisions
-        self.__create_costs()
+        self.__calculate_costs()
 
     def create_crossover_random_divisions(self, paths):
         self.paths = paths
         self.divisions = self.__create_random_salesman_division()
-        self.__create_costs()
+        self.__calculate_costs()
 
     def mutation_inversion(self):
         pos_1 = random.randint(0, len(self.paths)-2)
         pos_2 = random.randint(pos_1, len(self.paths)-1)
         self.paths = self.paths[: pos_1] + list(reversed(self.paths[pos_1 : pos_2])) + self.paths[pos_2 :]
         self.divisions = self.__create_random_salesman_division()
+        self.__calculate_costs()
         return 
 
     def mutation_transposition(self):
@@ -82,6 +85,7 @@ class Individual:
         pos_2 = random.randint(pos_1, len(self.paths)-1)
         self.paths = self.paths[pos_1 : pos_2] + self.paths[: pos_1] + self.paths[pos_2 :]
         self.divisions = self.__create_random_salesman_division()
+        self.__calculate_costs()
         return
         
     @property    

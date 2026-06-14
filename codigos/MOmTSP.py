@@ -41,14 +41,18 @@ class MOmTSP:
             
             population_next_generation = []
             rank = 0
-            while len(population_next_generation) + len(population_ranked[rank]) <= self.population.population_size:
+            while (
+                rank < len(population_ranked)
+                and len(population_next_generation) + len(population_ranked[rank]) <= self.population.population_size
+            ):
                 population_next_generation += population_ranked[rank]
                 rank += 1
 
-            last_rank = population_ranked[rank]
-            self.nsga2.crowding_distance(last_rank)
-            last_rank.sort(reverse=True, key=lambda x: x.crowding_distance) 
-            population_next_generation += last_rank[0 : (self.population.population_size - len(population_next_generation))]
+            if rank < len(population_ranked):
+                last_rank = population_ranked[rank]
+                self.nsga2.crowding_distance(last_rank)
+                last_rank.sort(reverse=True, key=lambda x: x.crowding_distance) 
+                population_next_generation += last_rank[0 : (self.population.population_size - len(population_next_generation))]
             
             self.population.prepare_next_generation(population_next_generation)
         

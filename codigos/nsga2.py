@@ -20,6 +20,9 @@ class NSGA2:
     def fast_non_dominated_sort(self, population : list[Individual]) -> list[list[Individual]]:
         ranks = [[]]
         for a in population:
+            a.domination_count = 0
+            a.dominated_solutions = []
+            a.rank = 0
             for b in population:
                 if a is b:
                     continue
