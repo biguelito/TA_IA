@@ -4,40 +4,38 @@ from momtsp import MOmTSP
 import timeit
 import random
 
-mutation_probability = 0.05
-population_size = 100
 
-def do_eil51():
-    salesman_quantity = 7    
-    problem = Problem("eil51", salesman_quantity)
-    iterations = 1400
+# def time_eil51():
+#     mutation_probability = 0.05
+#     population_size = 100
+#     salesman_quantity = 7    
+#     problem = Problem("eil51", salesman_quantity)
+#     iterations = 1400
 
-    pareto_front = MOmTSP(problem,
-                    population_size=population_size, 
-                    mutation_probability=mutation_probability,
-                    iterations=iterations).solve()
+#     momtsp = MOmTSP(problem,
+#                     population_size=population_size, 
+#                     mutation_probability=mutation_probability,
+#                     iterations=iterations)
     
-    last = pareto_front[-1]
-    semilast = pareto_front[-2]
+#     exec_time = timeit.timeit(lambda:momtsp.solve(), number=1)
+#     print(exec_time)
 
-    print(pareto_front)
-    print(last.chromossome)
-    print(semilast.chromossome)
-
-def time_eil51():
-    salesman_quantity = 7    
-    problem = Problem("eil51", salesman_quantity)
-    iterations = 1400
+def solve_problem(instance, population_size, mutation_probability, iterations, salesman_quantity, repetitions):
+    problem = Problem(instance, salesman_quantity)
 
     momtsp = MOmTSP(problem,
                     population_size=population_size, 
                     mutation_probability=mutation_probability,
                     iterations=iterations)
-    
-    exec_time = timeit.timeit(lambda:momtsp.solve(), number=10)
-    print(exec_time)
+    solutions = momtsp.solve_repetitions(repetitions)
+    return solutions
 
 if __name__ == "__main__":
-    # random.seed(42)
+    random.seed(42)
     
-    time_eil51()
+    salesman_quantity = 7  
+    iterations = 1400
+    repetitions = 1
+    mutation_probability = 0.05
+    population_size = 100
+    print(solve_problem("eil51", population_size, mutation_probability, iterations, salesman_quantity, repetitions))

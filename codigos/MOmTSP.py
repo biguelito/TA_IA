@@ -16,6 +16,18 @@ class MOmTSP:
         self.population = Population(iterations, population_size)
         self.common_operators = CommonOperators(problem)
         self.nsga2 = NSGA2()
+        self.solutions_chromossome_for_filtering = set()
+        self.unique_solutions = []
+        self.ranked_unique_solutions = None
+
+    def __save_unique_solutions(self, individuals):
+        for individual in individuals:
+            chromossome_key = tuple(individual.chromossome)
+            if chromossome_key in self.solutions_chromossome_for_filtering:
+                continue
+
+            self.solutions_chromossome_for_filtering.add(chromossome_key)
+            self.unique_solutions.append(individual)
 
     def __start_population(self):
         self.population.create_initial_population(self.problem)
@@ -55,8 +67,20 @@ class MOmTSP:
                 population_next_generation += last_rank[0 : (self.population.population_size - len(population_next_generation))]
             
             self.population.prepare_next_generation(population_next_generation)
-        
-        return self.population.result_individuals
 
-        
-        
+        best_solutions = self.population.result_individuals
+        self.__save_unique_solutions(best_solutions)
+        return best_solutions
+
+    def solve_repetitions(self, repetitions):
+        for i in range(repetitions):
+            self.solve()
+        return self.best_solutions
+
+    @property
+    def best_solutions(self):
+        if self.ranked_unique_solutions is None:
+            self.ranked_unique_solutions = self.nsga2.fast_non_dominated_sort(self.unique_solutions)
+        return self.ranked_unique_solutions[0]
+    
+
