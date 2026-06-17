@@ -33,9 +33,31 @@ def solve_problem(instance, population_size, mutation_probability, iterations, s
 if __name__ == "__main__":
     random.seed(42)
     
-    salesman_quantity = 7  
-    iterations = 1400
-    repetitions = 1
+    repetitions = 10
     mutation_probability = 0.05
     population_size = 100
-    print(solve_problem("eil51", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
+    
+    iterations = 1400
+    salesman_quantity = 7  
+    print("eil51 - 1400 - 7:", solve_problem("eil51", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
+    
+    iterations = 1400
+    salesman_quantity = 5  
+    print("berlin52 - 1400 - 5:", solve_problem("berlin52", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
+    
+    iterations = 1400
+    salesman_quantity = 7  
+    print("berlin52 - 1400 - 7:", solve_problem("berlin52", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
+    
+    iterations = 1800
+    salesman_quantity = 3 
+    print("eil76 - 1800 - 3:", solve_problem("eil76", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
+    
+    iterations = 1800
+    salesman_quantity = 7  
+    print("eil76 - 1800 - 7:", solve_problem("eil76", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
+    
+    iterations = 2200
+    salesman_quantity = 7  
+    print("rat99 - 2200 - 7:", solve_problem("rat99", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
+    
