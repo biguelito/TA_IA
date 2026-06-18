@@ -100,11 +100,15 @@ class Individual:
             complete_path += path
         return complete_path
 
+    @property
+    def id(self):
+        return f"({self.total_distance},{self.difference_longest_shortest},{self.rank},{self.crowding_distance})"
+    
     def __str__(self):
         return '-'.join(str(chro) for chro in self.paths)
     
     def __repr__(self):
-        return f"({self.total_distance},{self.difference_longest_shortest},{self.rank},{self.crowding_distance})"
+        return self.id
 
     def print_paths(self):
         start = 0

@@ -1,5 +1,4 @@
-from problem import Problem
-from momtsp import MOmTSP
+from solver import Solver
 
 import timeit
 import random
@@ -20,44 +19,10 @@ import random
 #     exec_time = timeit.timeit(lambda:momtsp.solve(), number=1)
 #     print(exec_time)
 
-def solve_problem(instance, population_size, mutation_probability, iterations, salesman_quantity, repetitions):
-    problem = Problem(instance, salesman_quantity)
-
-    momtsp = MOmTSP(problem,
-                    population_size=population_size, 
-                    mutation_probability=mutation_probability,
-                    iterations=iterations)
-    solutions = momtsp.solve_repetitions(repetitions)
-    return solutions
-
 if __name__ == "__main__":
     random.seed(42)
     
-    repetitions = 10
-    mutation_probability = 0.05
-    population_size = 100
-    
-    iterations = 1400
-    salesman_quantity = 7  
-    print("eil51 - 1400 - 7:", solve_problem("eil51", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
-    
-    iterations = 1400
-    salesman_quantity = 5  
-    print("berlin52 - 1400 - 5:", solve_problem("berlin52", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
-    
-    iterations = 1400
-    salesman_quantity = 7  
-    print("berlin52 - 1400 - 7:", solve_problem("berlin52", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
-    
-    iterations = 1800
-    salesman_quantity = 3 
-    print("eil76 - 1800 - 3:", solve_problem("eil76", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
-    
-    iterations = 1800
-    salesman_quantity = 7  
-    print("eil76 - 1800 - 7:", solve_problem("eil76", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
-    
-    iterations = 2200
-    salesman_quantity = 7  
-    print("rat99 - 2200 - 7:", solve_problem("rat99", population_size, mutation_probability, iterations, salesman_quantity, repetitions))
+    solver = Solver()
+    solution = solver.solve_eil51()
+
     
