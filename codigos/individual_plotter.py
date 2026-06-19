@@ -37,6 +37,19 @@ class IndividualPlotter:
 
         return x_points, y_points
 
+    def __annotate_cities(self, axes):
+        for city in self.problem.all_nodes:
+            x, y = self.__get_city_coordinates(city)
+            axes.annotate(
+                str(city),
+                (x, y),
+                textcoords="offset points",
+                xytext=(5, 5),
+                fontsize=8,
+                color="black",
+                zorder=6
+            )
+
     def plot_individual(
             self,
             individual: Individual,
@@ -71,6 +84,7 @@ class IndividualPlotter:
             zorder=5,
             label="Depot"
         )
+        self.__annotate_cities(axes)
 
         for index, route in enumerate(individual.salesman_paths):
             color = cmap(index % 10)
