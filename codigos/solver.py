@@ -24,11 +24,12 @@ class Solver:
         self.__record_result(solutions=solutions,
             total_exec_time=total_exec_time,
             iterations=iterations,
-            salesman_quantity=salesman_quantity)
+            salesman_quantity=salesman_quantity,
+            instance=instance)
         return total_exec_time, solutions
     
-    def __record_result(self, solutions : list[Individual], total_exec_time, iterations, salesman_quantity):
-        with open(f"./solucoes/{str(int(time.time()))}.txt", "w") as f:
+    def __record_result(self, solutions : list[Individual], total_exec_time, iterations, salesman_quantity, instance):
+        with open(f"./solucoes/{str(int(time.time()))}-{instance}-{iterations}-{salesman_quantity}.txt", "w") as f:
             f.write(f"eil51 - {iterations} - {salesman_quantity} - {total_exec_time}:\n")
             for s in solutions:
                 f.write(f"{s.id}: {s}\n")

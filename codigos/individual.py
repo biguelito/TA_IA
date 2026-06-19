@@ -72,6 +72,12 @@ class Individual:
         self.divisions = self.__create_random_salesman_division()
         self.__calculate_costs()
 
+    def create_previous_chromossome(self, chromossome : str):
+        chromossome_list = [int(chro) for chro in chromossome.split("-")]
+        self.paths = chromossome_list[:-(self.problem.salesman_quantity-1)]
+        self.divisions = chromossome_list[-(self.problem.salesman_quantity-1):]
+        self.__calculate_costs()
+
     def mutation_inversion(self):
         pos_1 = random.randint(0, len(self.paths)-2)
         pos_2 = random.randint(pos_1, len(self.paths)-1)
@@ -105,7 +111,7 @@ class Individual:
         return f"({self.total_distance},{self.difference_longest_shortest},{self.rank},{self.crowding_distance})"
     
     def __str__(self):
-        return '-'.join(str(chro) for chro in self.paths)
+        return '-'.join(str(chro) for chro in self.chromossome)
     
     def __repr__(self):
         return self.id

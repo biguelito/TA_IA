@@ -3,10 +3,81 @@ from problem import Problem
 
 import random
 import copy
+import math
 
 class CommonOperators:
     def __init__(self, problem : Problem):
         self.problem = problem
+
+    def __get_city_coordinates(self, city: int) -> tuple[float, float]:
+        coordinates = self.problem.instance.node_coords.get(city)
+        if coordinates is None:
+            raise ValueError(f"Coordinates not found for city {city}")
+
+        return float(coordinates[0]), float(coordinates[1])
+
+    def __euclidean_distance(self, a: tuple[float, float], b: tuple[float, float]) -> float:
+        return math.hypot(a[0] - b[0], a[1] - b[1])
+
+    def __calculate_centroid(self, route: list[int]) -> tuple[float, float]:
+        if len(route) == 0:
+            return self.__get_city_coordinates(self.problem.first_node)
+
+        coordinates = [self.__get_city_coordinates(city) for city in route]
+        x = sum(point[0] for point in coordinates) / len(coordinates)
+        y = sum(point[1] for point in coordinates) / len(coordinates)
+        return x, y
+
+    def __path_cost(self, route: list[int]) -> float:
+        salesman_path_complete = [self.problem.first_node] + route + [self.problem.first_node]
+        cost = 0.0
+        for point in range(len(salesman_path_complete)-1):
+            cost += self.problem.instance.get_weight(salesman_path_complete[point], salesman_path_complete[point+1])
+        return cost
+
+    def __find_closest_route_by_centroid(
+            self,
+            base_centroid: tuple[float, float],
+            candidate_indexes: list[int],
+            centroids: list[tuple[float, float]]
+    ) -> int:
+        return min(
+            candidate_indexes,
+            key=lambda index: self.__euclidean_distance(base_centroid, centroids[index])
+        )
+
+    def __find_closest_city_to_centroid(self, route: list[int], centroid: tuple[float, float]) -> int:
+        return min(
+            route,
+            key=lambda city: self.__euclidean_distance(self.__get_city_coordinates(city), centroid)
+        )
+
+    def __find_best_insertion_position(self, route: list[int], city: int) -> int:
+        best_position = 0
+        best_cost = None
+
+        for position in range(len(route) + 1):
+            candidate_route = route[:position] + [city] + route[position:]
+            candidate_cost = self.__path_cost(candidate_route)
+            if best_cost is None or candidate_cost < best_cost:
+                best_cost = candidate_cost
+                best_position = position
+
+        return best_position
+
+    def __rebuild_individual_from_routes(self, individual: Individual, routes: list[list[int]]):
+        paths = []
+        divisions = []
+        accumulated_size = 0
+
+        for index, route in enumerate(routes):
+            paths.extend(route)
+            accumulated_size += len(route)
+            if index < len(routes) - 1:
+                divisions.append(accumulated_size)
+
+        individual.create_crossover(paths, divisions)
+        return individual
 
     def __binary_tournament(self, population : list[Individual]) -> list[Individual]:
         selection = []
@@ -109,3 +180,60 @@ class CommonOperators:
             childs.append(child_2)
 
         return childs
+
+    def rebalance_by_centroid(self, individual: Individual, mode: str) -> Individual:
+        routes = copy.deepcopy(individual.salesman_paths)
+
+        if len(routes) < 2:
+            return individual
+
+        costs = [self.__path_cost(route) for route in routes]
+        centroids = [self.__calculate_centroid(route) for route in routes]
+
+        if mode == "expand_shortest":
+            destination_index = min(range(len(costs)), key=lambda index: costs[index])
+            candidate_origins = [
+                index for index in range(len(routes))
+                if index != destination_index and len(routes[index]) > 1
+            ]
+
+            if len(candidate_origins) == 0:
+                return individual
+
+            origin_index = self.__find_closest_route_by_centroid(
+                centroids[destination_index],
+                candidate_origins,
+                centroids
+            )
+            target_centroid = centroids[destination_index]
+
+        elif mode == "shrink_longest":
+            origin_index = max(range(len(costs)), key=lambda index: costs[index])
+            if len(routes[origin_index]) <= 1:
+                return individual
+
+            candidate_destinations = [
+                index for index in range(len(routes))
+                if index != origin_index
+            ]
+
+            if len(candidate_destinations) == 0:
+                return individual
+
+            destination_index = self.__find_closest_route_by_centroid(
+                centroids[origin_index],
+                candidate_destinations,
+                centroids
+            )
+            target_centroid = centroids[destination_index]
+
+        else:
+            return individual
+
+        city_to_move = self.__find_closest_city_to_centroid(routes[origin_index], target_centroid)
+        routes[origin_index].remove(city_to_move)
+
+        insertion_position = self.__find_best_insertion_position(routes[destination_index], city_to_move)
+        routes[destination_index].insert(insertion_position, city_to_move)
+
+        return self.__rebuild_individual_from_routes(individual, routes)
