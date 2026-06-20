@@ -82,16 +82,6 @@ class Solver:
         plotter.plot_individual(solution, show_centroids=True, save_path=f"{path}-individual.png", show_plot=False)
         plotter.plot_pareto_front(solutions, save_path=f"{path}-pareto.png", show_plot=False)
         return
-
-    def solve_eil51(self, iterations=1400, salesman_quantity=7) -> list[Individual]:
-        total_exec_time, solutions = self.__solve_problem(
-            instance="eil51", 
-            population_size=self.population_size, 
-            mutation_probability=self.mutation_probability, 
-            iterations=iterations, 
-            salesman_quantity=salesman_quantity, 
-            repetitions=self.repetitions)
-        return total_exec_time, solutions
     
     def solve(self, instance) -> list[Individual]:
         iterations = self.variations[instance]["iterations"]

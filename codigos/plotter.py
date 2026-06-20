@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 
 from individual import Individual
 from problem import Problem
-
+from common_operators import CommonOperators
 
 
 class Plotter:
     def __init__(self, problem: Problem):
         self.problem = problem
+        self.common_operators = CommonOperators(self.problem)
 
     def __get_city_coordinates(self, city: int) -> tuple[float, float]:
         coordinates = self.problem.instance.node_coords.get(city)
@@ -15,15 +16,6 @@ class Plotter:
             raise ValueError(f"Coordinates not found for city {city}")
 
         return float(coordinates[0]), float(coordinates[1])
-
-    def __calculate_centroid(self, route: list[int]) -> tuple[float, float]:
-        if len(route) == 0:
-            return self.__get_city_coordinates(self.problem.first_node)
-
-        coordinates = [self.__get_city_coordinates(city) for city in route]
-        x = sum(point[0] for point in coordinates) / len(coordinates)
-        y = sum(point[1] for point in coordinates) / len(coordinates)
-        return x, y
 
     def __get_route_points(self, route: list[int]) -> tuple[list[float], list[float]]:
         complete_route = [self.problem.first_node] + route + [self.problem.first_node]
@@ -108,7 +100,7 @@ class Plotter:
                 axes.scatter(route_x, route_y, color=color, s=45, zorder=3)
 
             if show_centroids:
-                centroid_x, centroid_y = self.__calculate_centroid(route)
+                centroid_x, centroid_y = self.common_operators.calculate_centroid(route)
                 axes.scatter(
                     centroid_x,
                     centroid_y,

@@ -19,15 +19,6 @@ class CommonOperators:
     def __euclidean_distance(self, a: tuple[float, float], b: tuple[float, float]) -> float:
         return math.hypot(a[0] - b[0], a[1] - b[1])
 
-    def __calculate_centroid(self, route: list[int]) -> tuple[float, float]:
-        if len(route) == 0:
-            return self.__get_city_coordinates(self.problem.first_node)
-
-        coordinates = [self.__get_city_coordinates(city) for city in route]
-        x = sum(point[0] for point in coordinates) / len(coordinates)
-        y = sum(point[1] for point in coordinates) / len(coordinates)
-        return x, y
-
     def __path_cost(self, route: list[int]) -> float:
         salesman_path_complete = [self.problem.first_node] + route + [self.problem.first_node]
         cost = 0.0
@@ -162,6 +153,17 @@ class CommonOperators:
 
         return child
 
+    def calculate_centroid(self, route: list[int]) -> tuple[float, float]:
+        if len(route) == 0:
+            return self.__get_city_coordinates(self.problem.first_node)
+        
+        route.append(self.problem.first_node) 
+        coordinates = [self.__get_city_coordinates(city) for city in route]
+        x = sum(point[0] for point in coordinates) / len(coordinates)
+        y = sum(point[1] for point in coordinates) / len(coordinates)
+        route.pop()
+        return x, y
+
     def binary_tournament_selection(self, population : list[Individual]):
         random_arragement_first_half = random.sample(population, k=len(population))
         selection_first_half = self.__binary_tournament(random_arragement_first_half)
@@ -187,8 +189,8 @@ class CommonOperators:
         if len(routes) < 2:
             return individual
 
-        costs = [self.__path_cost(route) for route in routes]
-        centroids = [self.__calculate_centroid(route) for route in routes]
+        costs = individual.total_per_salesman
+        centroids = [self.calculate_centroid(route) for route in routes]
 
         if mode == "expand_shortest":
             destination_index = min(range(len(costs)), key=lambda index: costs[index])
@@ -205,6 +207,7 @@ class CommonOperators:
                 candidate_origins,
                 centroids
             )
+            
             target_centroid = centroids[destination_index]
 
         elif mode == "shrink_longest":
@@ -230,10 +233,14 @@ class CommonOperators:
         else:
             return individual
 
+        # if len(routes[origin_index]) <= 2:
+        #     return individual
+
         city_to_move = self.__find_closest_city_to_centroid(routes[origin_index], target_centroid)
         routes[origin_index].remove(city_to_move)
 
         insertion_position = self.__find_best_insertion_position(routes[destination_index], city_to_move)
         routes[destination_index].insert(insertion_position, city_to_move)
 
-        return self.__rebuild_individual_from_routes(individual, routes)
+        new_invidual = self.__rebuild_individual_from_routes(individual, routes)
+        return new_invidual
