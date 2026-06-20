@@ -1,6 +1,7 @@
 from problem import Problem
 from momtsp import MOmTSP
 from individual import Individual
+from plotter import Plotter
 
 import timeit
 import time
@@ -10,6 +11,7 @@ class Solver:
         self.repetitions = 10
         self.mutation_probability = 0.05
         self.population_size = 100
+        
         return
 
     def __solve_problem(self, instance, population_size, mutation_probability, iterations, salesman_quantity, repetitions) -> tuple[float, list[Individual]]:
@@ -21,18 +23,35 @@ class Solver:
                         iterations=iterations)
         total_exec_time = timeit.timeit(lambda: momtsp.solve_repetitions(repetitions), number=1) 
         solutions = momtsp.best_solutions 
-        self.__record_result(solutions=solutions,
+        
+        moment = str(int(time.time()))
+        self.__record_result(problem,
+            solutions=solutions,
             total_exec_time=total_exec_time,
             iterations=iterations,
             salesman_quantity=salesman_quantity,
-            instance=instance)
+            instance=instance,
+            moment=moment)
         return total_exec_time, solutions
     
-    def __record_result(self, solutions : list[Individual], total_exec_time, iterations, salesman_quantity, instance):
-        with open(f"./solucoes/{str(int(time.time()))}-{instance}-{iterations}-{salesman_quantity}.txt", "w") as f:
+    def __record_result(self, 
+        problem : Problem,
+        solutions : list[Individual],
+        total_exec_time : float,
+        iterations : int,
+        salesman_quantity : int, 
+        instance : str,
+        moment : str
+    ):
+        path = f"./solucoes/{moment}-{instance}-{iterations}-{salesman_quantity}"
+        with open(f"{path}-solucoes.txt", "w") as f:
             f.write(f"eil51 - {iterations} - {salesman_quantity} - {total_exec_time}:\n")
             for s in solutions:
                 f.write(f"{s.id}: {s}\n")
+        
+        plotter = Plotter(problem)
+        plotter.plot_individual(solutions[0], show_centroids=True, save_path=f"{path}-individual.png")
+        plotter.plot_pareto_front(solutions, save_path=f"{path}-pareto.png")
         return
 
     def solve_eil51(self, iterations=1400, salesman_quantity=7) -> list[Individual]:

@@ -5,7 +5,7 @@ from problem import Problem
 
 
 
-class IndividualPlotter:
+class Plotter:
     def __init__(self, problem: Problem):
         self.problem = problem
 
@@ -128,6 +128,54 @@ class IndividualPlotter:
         axes.set_ylabel("Y")
         axes.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)
         axes.set_aspect("equal", adjustable="box")
+        axes.legend(loc="best")
+        figure.tight_layout()
+
+        if save_path is not None:
+            figure.savefig(save_path, dpi=200, bbox_inches="tight")
+
+        if show_plot:
+            plt.show()
+        else:
+            plt.close(figure)
+
+        return figure, axes
+
+    def plot_pareto_front(
+            self,
+            individuals: list[Individual],
+            save_path: str | None = None,
+            show_plot: bool = True
+    ):
+        if individuals is None or len(individuals) == 0:
+            raise ValueError("The list of individuals to plot cannot be empty.")
+
+        sorted_individuals = sorted(individuals, key=lambda individual: individual.total_distance)
+        x_points = [individual.total_distance for individual in sorted_individuals]
+        y_points = [individual.difference_longest_shortest for individual in sorted_individuals]
+
+        figure, axes = plt.subplots(figsize=(10, 8))
+        axes.scatter(
+            x_points,
+            y_points,
+            color="royalblue",
+            s=55,
+            zorder=3,
+            label="Individuals"
+        )
+        axes.plot(
+            x_points,
+            y_points,
+            color="royalblue",
+            linewidth=1.6,
+            alpha=0.8,
+            zorder=2
+        )
+
+        axes.set_title(f"Pareto front - {len(sorted_individuals)} individuals")
+        axes.set_xlabel("Total cost")
+        axes.set_ylabel("Cost difference")
+        axes.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)
         axes.legend(loc="best")
         figure.tight_layout()
 

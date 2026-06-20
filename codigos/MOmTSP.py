@@ -80,7 +80,8 @@ class MOmTSP:
     @property
     def best_solutions(self):
         if self.ranked_unique_solutions is None:
-            self.ranked_unique_solutions = self.nsga2.fast_non_dominated_sort(self.unique_solutions)
-        return self.ranked_unique_solutions[0]
+            self.ranked_unique_solutions = self.nsga2.fast_non_dominated_sort(self.unique_solutions)[0]
+            self.nsga2.crowding_distance(self.ranked_unique_solutions)
+        return self.ranked_unique_solutions
     
 
