@@ -5,13 +5,41 @@ from plotter import Plotter
 
 import timeit
 import time
+import random
 
 class Solver:
     def __init__(self):    
-        self.repetitions = 10
+        self.repetitions = 1
         self.mutation_probability = 0.05
         self.population_size = 100
         
+        self.variations = {
+            "eil51": {
+                "salesman_quantity": 7,
+                "iterations": 1400                
+            }, 
+            "berlin52_1": {
+                "salesman_quantity": 5,
+                "iterations": 1400                
+            },
+            "berlin52_2": {
+                "salesman_quantity": 7,
+                "iterations": 1400                
+            },
+            "eil76_1": {
+                "salesman_quantity": 3,
+                "iterations": 1800                
+            },
+            "eil76_2": {
+                "salesman_quantity": 7,
+                "iterations": 1800                
+            },
+            "rat99": {
+                "salesman_quantity": 7,
+                "iterations": 2200                
+            } 
+        }
+
         return
 
     def __solve_problem(self, instance, population_size, mutation_probability, iterations, salesman_quantity, repetitions) -> tuple[float, list[Individual]]:
@@ -25,7 +53,7 @@ class Solver:
         solutions = momtsp.best_solutions 
         
         moment = str(int(time.time()))
-        self.__record_result(problem,
+        self.__save_result(problem,
             solutions=solutions,
             total_exec_time=total_exec_time,
             iterations=iterations,
@@ -34,7 +62,7 @@ class Solver:
             moment=moment)
         return total_exec_time, solutions
     
-    def __record_result(self, 
+    def __save_result(self, 
         problem : Problem,
         solutions : list[Individual],
         total_exec_time : float,
@@ -50,8 +78,9 @@ class Solver:
                 f.write(f"{s.id}: {s}\n")
         
         plotter = Plotter(problem)
-        plotter.plot_individual(solutions[0], show_centroids=True, save_path=f"{path}-individual.png")
-        plotter.plot_pareto_front(solutions, save_path=f"{path}-pareto.png")
+        solution = random.sample(solutions, k=1)[0]
+        plotter.plot_individual(solution, show_centroids=True, save_path=f"{path}-individual.png", show_plot=False)
+        plotter.plot_pareto_front(solutions, save_path=f"{path}-pareto.png", show_plot=False)
         return
 
     def solve_eil51(self, iterations=1400, salesman_quantity=7) -> list[Individual]:
@@ -64,35 +93,17 @@ class Solver:
             repetitions=self.repetitions)
         return total_exec_time, solutions
     
-    def solve_eil76(self, iterations=1800, salesman_quantity=7) -> list[Individual]:
-        total_exec_time, solutions = self.__solve_problem(
-            instance="eil76", 
-            population_size=self.population_size, 
-            mutation_probability=self.mutation_probability, 
-            iterations=iterations, 
-            salesman_quantity=salesman_quantity, 
-            repetitions=self.repetitions)
+    def solve(self, instance) -> list[Individual]:
+        iterations = self.variations[instance]["iterations"]
+        salesman_quantity = self.variations[instance]["salesman_quantity"]
         
-        return total_exec_time, solutions
-    
-    def solve_berlin52(self, iterations=1400, salesman_quantity=5):
         total_exec_time, solutions = self.__solve_problem(
-            instance="berlin52", 
+            instance="eil51", 
             population_size=self.population_size, 
             mutation_probability=self.mutation_probability, 
             iterations=iterations, 
             salesman_quantity=salesman_quantity, 
             repetitions=self.repetitions)
-        
         return total_exec_time, solutions
-    
-    def solve_rat99(self, iterations=2200, salesman_quantity=7):
-        total_exec_time, solutions = self.__solve_problem(
-            instance="rat99", 
-            population_size=self.population_size, 
-            mutation_probability=self.mutation_probability, 
-            iterations=iterations, 
-            salesman_quantity=salesman_quantity, 
-            repetitions=self.repetitions)
 
-        return total_exec_time, solutions
+# def find_nadir_point():

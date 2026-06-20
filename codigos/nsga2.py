@@ -58,28 +58,45 @@ class NSGA2:
             return
 
         rank_size = len(rank)
+        original_order = {individual: index for index, individual in enumerate(rank)}
         for individual in rank:
             individual.crowding_distance = 0
+
+        min_total_distance = min(individual.total_distance for individual in rank)
+        min_difference = min(individual.difference_longest_shortest for individual in rank)
+
+        total_distance_extreme = min(
+            (individual for individual in rank if individual.total_distance == min_total_distance),
+            key=lambda individual: original_order[individual]
+        )
+        difference_extreme = min(
+            (
+                individual for individual in rank
+                if individual.difference_longest_shortest == min_difference
+            ),
+            key=lambda individual: original_order[individual]
+        )
 
         objectives = [
             lambda x: x.total_distance,
             lambda x: x.difference_longest_shortest
         ]
         for objective in objectives:
-            rank.sort(key=objective)
-            rank[0].crowding_distance = float("inf")
-            rank[-1].crowding_distance = float("inf")
+            ordered_rank = sorted(rank, key=objective)
 
-            f_min = objective(rank[0])
-            f_max = objective(rank[-1])
+            f_min = objective(ordered_rank[0])
+            f_max = objective(ordered_rank[-1])
 
             if f_max == f_min:
                 continue
 
             for i in range(1, rank_size - 1):
-                previous_value = objective(rank[i - 1])
-                next_value = objective(rank[i + 1])
-                rank[i].crowding_distance += (next_value - previous_value) / (f_max - f_min)
+                previous_value = objective(ordered_rank[i - 1])
+                next_value = objective(ordered_rank[i + 1])
+                ordered_rank[i].crowding_distance += (next_value - previous_value) / (f_max - f_min)
+
+        total_distance_extreme.crowding_distance = float("inf")
+        difference_extreme.crowding_distance = float("inf")
         return
 
     def print_ranks(ranks):
