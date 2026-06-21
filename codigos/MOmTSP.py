@@ -4,6 +4,7 @@ from population import Population
 from operators import Operators
 
 import random
+
 class MOmTSP:
     def __init__(self, 
             problem : Problem,

@@ -1,8 +1,8 @@
-import matplotlib.pyplot as plt
-
 from individual import Individual
 from problem import Problem
 from basic_operations import BasicOperations
+
+import matplotlib.pyplot as plt
 
 class Plotter:
     def __init__(self, problem: Problem):

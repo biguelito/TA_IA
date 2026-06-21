@@ -6,7 +6,6 @@ from result import Result
 
 import timeit
 import time
-import random
 
 class Solver:
     def __init__(self):    

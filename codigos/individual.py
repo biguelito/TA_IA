@@ -1,6 +1,6 @@
-import random
-
 from problem import Problem
+
+import random
 
 class Individual:
     def __init__(self, problem : Problem):

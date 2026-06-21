@@ -218,9 +218,6 @@ class Operators:
         else:
             return individual
 
-        # if len(routes[origin_index]) <= 2:
-        #     return individual
-
         city_to_move = self.__find_closest_city_to_centroid(routes[origin_index], target_centroid)
         routes[origin_index].remove(city_to_move)
 

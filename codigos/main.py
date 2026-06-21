@@ -5,7 +5,6 @@ from individual import Individual
 from operators import Operators
 
 import time
-import random
 
 def test_rebalance_by_centroid():
     problem = Problem("eil51", 7)
