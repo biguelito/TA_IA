@@ -1,20 +1,16 @@
 from individual import Individual
 from problem import Problem
+from basic_operations import BasicOperations
 
 import random
 import copy
 import math
 
-class CommonOperators:
+class Operators:
     def __init__(self, problem : Problem):
         self.problem = problem
-
-    def __get_city_coordinates(self, city: int) -> tuple[float, float]:
-        coordinates = self.problem.instance.node_coords.get(city)
-        if coordinates is None:
-            raise ValueError(f"Coordinates not found for city {city}")
-
-        return float(coordinates[0]), float(coordinates[1])
+        self.basic_operations = BasicOperations(problem)
+        return
 
     def __euclidean_distance(self, a: tuple[float, float], b: tuple[float, float]) -> float:
         return math.hypot(a[0] - b[0], a[1] - b[1])
@@ -40,7 +36,7 @@ class CommonOperators:
     def __find_closest_city_to_centroid(self, route: list[int], centroid: tuple[float, float]) -> int:
         return min(
             route,
-            key=lambda city: self.__euclidean_distance(self.__get_city_coordinates(city), centroid)
+            key=lambda city: self.__euclidean_distance(self.basic_operations.get_city_coordinates(city), centroid)
         )
 
     def __find_best_insertion_position(self, route: list[int], city: int) -> int:
@@ -152,17 +148,6 @@ class CommonOperators:
         child.create_crossover_random_divisions(child_paths)
 
         return child
-
-    def calculate_centroid(self, route: list[int]) -> tuple[float, float]:
-        if len(route) == 0:
-            return self.__get_city_coordinates(self.problem.first_node)
-        
-        route.append(self.problem.first_node) 
-        coordinates = [self.__get_city_coordinates(city) for city in route]
-        x = sum(point[0] for point in coordinates) / len(coordinates)
-        y = sum(point[1] for point in coordinates) / len(coordinates)
-        route.pop()
-        return x, y
 
     def binary_tournament_selection(self, population : list[Individual]):
         random_arragement_first_half = random.sample(population, k=len(population))

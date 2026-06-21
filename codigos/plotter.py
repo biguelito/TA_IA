@@ -2,20 +2,13 @@ import matplotlib.pyplot as plt
 
 from individual import Individual
 from problem import Problem
-from common_operators import CommonOperators
-
+from basic_operations import BasicOperations
 
 class Plotter:
     def __init__(self, problem: Problem):
         self.problem = problem
-        self.common_operators = CommonOperators(self.problem)
+        self.basic_operations = BasicOperations(self.problem)
 
-    def __get_city_coordinates(self, city: int) -> tuple[float, float]:
-        coordinates = self.problem.instance.node_coords.get(city)
-        if coordinates is None:
-            raise ValueError(f"Coordinates not found for city {city}")
-
-        return float(coordinates[0]), float(coordinates[1])
 
     def __get_route_points(self, route: list[int]) -> tuple[list[float], list[float]]:
         complete_route = [self.problem.first_node] + route + [self.problem.first_node]
@@ -23,7 +16,7 @@ class Plotter:
         y_points = []
 
         for city in complete_route:
-            x, y = self.__get_city_coordinates(city)
+            x, y = self.basic_operations.get_city_coordinates(city)
             x_points.append(x)
             y_points.append(y)
 
@@ -31,7 +24,7 @@ class Plotter:
 
     def __annotate_cities(self, axes):
         for city in self.problem.all_nodes:
-            x, y = self.__get_city_coordinates(city)
+            x, y = self.basic_operations.get_city_coordinates(city)
             axes.annotate(
                 str(city),
                 (x, y),
@@ -58,13 +51,13 @@ class Plotter:
         all_x = []
         all_y = []
         for city in self.problem.all_nodes:
-            x, y = self.__get_city_coordinates(city)
+            x, y = self.basic_operations.get_city_coordinates(city)
             all_x.append(x)
             all_y.append(y)
 
         axes.scatter(all_x, all_y, color="lightgray", s=35, zorder=1, label="Cities")
 
-        depot_x, depot_y = self.__get_city_coordinates(self.problem.first_node)
+        depot_x, depot_y = self.basic_operations.get_city_coordinates(self.problem.first_node)
         axes.scatter(
             depot_x,
             depot_y,
@@ -94,13 +87,13 @@ class Plotter:
                 route_x = []
                 route_y = []
                 for city in route:
-                    x, y = self.__get_city_coordinates(city)
+                    x, y = self.basic_operations.get_city_coordinates(city)
                     route_x.append(x)
                     route_y.append(y)
                 axes.scatter(route_x, route_y, color=color, s=45, zorder=3)
 
             if show_centroids:
-                centroid_x, centroid_y = self.common_operators.calculate_centroid(route)
+                centroid_x, centroid_y = self.basic_operations.calculate_centroid(route)
                 axes.scatter(
                     centroid_x,
                     centroid_y,
@@ -113,7 +106,7 @@ class Plotter:
                 )
 
         axes.set_title(
-            f"Individual routes - total distance: {individual.total_distance} - "
+            f"{individual.problem.instance_name} - total distance: {individual.total_distance} - "
             f"difference: {individual.difference_longest_shortest}"
         )
         axes.set_xlabel("X")
@@ -166,7 +159,7 @@ class Plotter:
             zorder=2
         )
 
-        axes.set_title(f"Pareto front - {len(sorted_individuals)} individuals")
+        axes.set_title(f"{individuals[0].problem.instance_name} - Pareto front - {len(sorted_individuals)} individuals")
         axes.set_xlabel("Total cost")
         axes.set_ylabel("Cost difference")
         axes.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)

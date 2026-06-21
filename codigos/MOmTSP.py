@@ -1,7 +1,7 @@
 from problem import Problem
 from nsga2 import NSGA2
 from population import Population
-from common_operators import CommonOperators
+from operators import Operators
 
 import random
 class MOmTSP:
@@ -14,7 +14,7 @@ class MOmTSP:
         self.problem = problem        
         self.mutation_probability = mutation_probability
         self.population = Population(iterations, population_size)
-        self.common_operators = CommonOperators(problem)
+        self.operators = Operators(problem)
         self.nsga2 = NSGA2()
         self.solutions_chromossome_for_filtering = set()
         self.unique_solutions = []
@@ -39,8 +39,8 @@ class MOmTSP:
     def solve(self):
         self.__start_population()
         for i in range(self.population.generations):
-            population_for_crossover = self.common_operators.binary_tournament_selection(self.population.actual_population)
-            self.population.actual_childs = self.common_operators.crossover(population_for_crossover)
+            population_for_crossover = self.operators.binary_tournament_selection(self.population.actual_population)
+            self.population.actual_childs = self.operators.crossover(population_for_crossover)
     
             for child in self.population.actual_childs:
                 if (random.uniform(0, 1) <= self.mutation_probability):

@@ -2,7 +2,7 @@ from solver import Solver
 from plotter import Plotter
 from problem import Problem
 from individual import Individual
-from common_operators import CommonOperators
+from operators import Operators
 
 import time
 import random
@@ -20,13 +20,22 @@ def test_rebalance_by_centroid():
                             save_path=f"solucoes/{(int(time.time()))}-previous_path_saida_before.png"
     )
 
-    CommonOperators(problem).rebalance_by_centroid(individual_solution, mode="expand_shortest")
+    Operators(problem).rebalance_by_centroid(individual_solution, mode="expand_shortest")
     plotter.plot_individual(individual_solution,
                             show_centroids=True,
                             save_path=f"solucoes/{(int(time.time()))}-previous_path_saida_after.png"
     )
 
+def find_nadir():
+    solver = Solver()
+    # solver.find_near_nadir_point("eil51", 100)
+    # solver.find_near_nadir_point("berlin52_1", 100)
+    solver.find_near_nadir_point("berlin52_2", 100)
+    # solver.find_near_nadir_point("eil76_1", 100)
+    solver.find_near_nadir_point("eil76_2", 100)
+    solver.find_near_nadir_point("rat99", 100)
+    return
 
 if __name__ == "__main__":
     solver = Solver()
-    solver.find_near_nadir_point("eil51", 100)
+    solver.solve("eil51")
