@@ -137,7 +137,9 @@ class Plotter:
             self,
             individuals: list[Individual],
             save_path: str | None = None,
-            show_plot: bool = True
+            show_plot: bool = True,
+            max_point: tuple[int, int] | None = None,
+            min_point: tuple[int, int] | None = None
     ):
         if individuals is None or len(individuals) == 0:
             raise ValueError("The list of individuals to plot cannot be empty.")
@@ -170,6 +172,23 @@ class Plotter:
         axes.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)
         axes.legend(loc="best")
         figure.tight_layout()
+
+        if (max_point != None):
+            axes.scatter(
+                max_point[0],
+                max_point[1],
+                color="red",
+                s=55,
+                zorder=3,
+            )
+        if (min_point != None):
+            axes.scatter(
+                min_point[0],
+                min_point[1],
+                color="green",
+                s=55,
+                zorder=3,
+            )
 
         if save_path is not None:
             figure.savefig(save_path, dpi=200, bbox_inches="tight")

@@ -28,7 +28,5 @@ def test_rebalance_by_centroid():
 
 
 if __name__ == "__main__":
-    random.seed(42)
-
     solver = Solver()
-    solver.solve("eil51")
+    solver.find_near_nadir_point("eil51", 100)
