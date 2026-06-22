@@ -1,8 +1,9 @@
+from matplotlib.axes import Axes
+import matplotlib.pyplot as plt
+
 from individual import Individual
 from problem import Problem
 from basic_operations import BasicOperations
-
-import matplotlib.pyplot as plt
 
 class Plotter:
     def __init__(self, problem: Problem):
@@ -126,6 +127,46 @@ class Plotter:
 
         return figure, axes
 
+    def __draw_extra(self, axes : Axes, min_point, max_point, left_extreme_solution, right_extreme_solution):
+        left_theoretical_extreme = (min_point[0], max_point[1])
+        right_theoretical_extreme = (max_point[0], min_point[1])
+
+        axes.scatter(
+            [left_extreme_solution[0], right_extreme_solution[0]],
+            [left_extreme_solution[1], right_extreme_solution[1]],
+            color="gold",
+            s=80,
+            edgecolors="black",
+            linewidths=0.6,
+            zorder=4,
+        )
+        axes.scatter(
+            [max_point[0], min_point[0]],
+            [min_point[1], max_point[1]],
+            color="gold",
+            s=80,
+            edgecolors="black",
+            linewidths=0.6,
+            zorder=4,
+        )
+
+        axes.plot(
+            [left_extreme_solution[0], left_theoretical_extreme[0]],
+            [left_extreme_solution[1], left_theoretical_extreme[1]],
+            color="gold",
+            linestyle="--",
+            linewidth=1.6,
+            zorder=2,
+        )
+        axes.plot(
+            [right_extreme_solution[0], right_theoretical_extreme[0]],
+            [right_extreme_solution[1], right_theoretical_extreme[1]],
+            color="gold",
+            linestyle="--",
+            linewidth=1.6,
+            zorder=2,
+        )
+
     def plot_pareto_front(
             self,
             individuals: list[Individual],
@@ -151,7 +192,6 @@ class Plotter:
             color="royalblue",
             s=55,
             zorder=3,
-            # label="Individuals"
         )
         axes.plot(
             x_points,
@@ -166,7 +206,6 @@ class Plotter:
         axes.set_xlabel("Total cost")
         axes.set_ylabel("Cost difference")
         axes.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)
-        # axes.legend()
         figure.tight_layout()
 
         if (max_point != None):
@@ -177,6 +216,14 @@ class Plotter:
                 s=55,
                 zorder=3,
             )
+            if fill:
+                axes.fill(
+                    x_points + [max_point[0]],
+                    y_points + [max_point[1]],
+                    hatch="\\",
+                    alpha=0.1
+                )
+
         if (min_point != None):
             axes.scatter(
                 min_point[0],
@@ -186,15 +233,14 @@ class Plotter:
                 zorder=3,
             )
 
-        if fill:
-            x_points.append(max_point[0])
-            y_points.append(max_point[1])
-            axes.fill(
-                x_points,
-                y_points,
-                hatch="\\",
-                alpha=0.1
-            )
+        if (min_point != None and max_point != None):
+            left_extreme_solution = (x_points[0], y_points[0])
+            right_extreme_solution = (x_points[-1], y_points[-1])
+            self.__draw_extra(axes=axes,
+                            min_point=min_point,
+                            max_point=max_point,
+                            left_extreme_solution=left_extreme_solution,
+                            right_extreme_solution=right_extreme_solution)
 
         metrics = []
         if hypervolume >= 0:
