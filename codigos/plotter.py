@@ -253,11 +253,11 @@ class Plotter:
         if len(metrics) > 0:
             axes.text(
                 0.02,
-                0.98,
+                0.02,
                 "\n".join(metrics),
                 transform=axes.transAxes,
                 ha="left",
-                va="top",
+                va="bottom",
                 fontsize=10,
                 bbox=dict(boxstyle="round,pad=0.25", facecolor="white", alpha=0.8)
             )

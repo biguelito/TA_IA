@@ -58,6 +58,8 @@ class BasicOperations:
 
         max_point = self.problem.get_nadir_point()
         min_point = self.problem.get_min_point()
+        left_theoretical_extreme = (min_point[0], max_point[1])
+        right_theoretical_extreme = (max_point[0], min_point[1])
 
         consecutive_distances = [
             math.dist(points[i], points[i + 1])
@@ -65,8 +67,8 @@ class BasicOperations:
         ]
         mean_distance = sum(consecutive_distances) / (n - 1)
 
-        distance_first_extreme = math.dist(points[0], min_point)
-        distance_last_extreme = math.dist(points[-1], max_point)
+        distance_first_extreme = math.dist(points[0], left_theoretical_extreme)
+        distance_last_extreme = math.dist(points[-1], right_theoretical_extreme)
 
         denominator = distance_first_extreme + distance_last_extreme + ((n - 1) * mean_distance)
         if denominator == 0:
