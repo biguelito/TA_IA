@@ -4,6 +4,7 @@ from plotter import Plotter
 
 import random
 import time
+from shapely.geometry import Polygon
 
 class Result:
     def __init__(self, problem : Problem, solutions : list[Individual], iterations : int):
@@ -30,7 +31,14 @@ class Result:
         return
     
     def evaluate_pareto(self):
+        nadir_point = self.problem.get_nadir_point()
+        vertices = [(solution.total_distance, solution.difference_longest_shortest) for solution in self.solutions]
+        vertices.append(nadir_point)
+        polygon = Polygon(vertices) 
+        hypervolume = polygon.area
+
         self.plotter.plot_pareto_front(self.solutions, 
             save_path=f"{self.path}-pareto.png",
-            show_plot=False,
-            max_point=self.problem.get_nadir_point())
+            show_plot=True,
+            max_point=nadir_point,
+            hypervolume=hypervolume)

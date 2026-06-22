@@ -29,8 +29,8 @@ def find_nadir():
     solver = Solver()
     # solver.find_near_nadir_point("eil51", 100)
     # solver.find_near_nadir_point("berlin52_1", 100)
-    solver.find_near_nadir_point("berlin52_2", 100)
-    # solver.find_near_nadir_point("eil76_1", 100)
+    # solver.find_near_nadir_point("berlin52_2", 100)
+    solver.find_near_nadir_point("eil76_1", 100)
     solver.find_near_nadir_point("eil76_2", 100)
     solver.find_near_nadir_point("rat99", 100)
     return

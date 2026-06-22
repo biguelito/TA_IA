@@ -12,13 +12,20 @@ class BasicOperations:
 
         return float(coordinates[0]), float(coordinates[1])
 
-    def calculate_centroid(self, route: list[int]) -> tuple[float, float]:
+    def __calculate_centroid(self, coordinates : list[tuple[int, int]]):
+        x = sum(point[0] for point in coordinates) / len(coordinates)
+        y = sum(point[1] for point in coordinates) / len(coordinates)
+        return x, y
+
+    def calculate_centroid_by_cities(self, route: list[int]) -> tuple[float, float]:
         if len(route) == 0:
             return self.get_city_coordinates(self.problem.first_node)
         
         route.append(self.problem.first_node) 
         coordinates = [self.get_city_coordinates(city) for city in route]
-        x = sum(point[0] for point in coordinates) / len(coordinates)
-        y = sum(point[1] for point in coordinates) / len(coordinates)
+        x, y = self.__calculate_centroid(coordinates)
         route.pop()
         return x, y
+    
+    def calculate_centroid_by_points(self, points: list[tuple[int, int]]):
+        return self.__calculate_centroid(points)

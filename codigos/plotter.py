@@ -93,7 +93,7 @@ class Plotter:
                 axes.scatter(route_x, route_y, color=color, s=45, zorder=3)
 
             if show_centroids:
-                centroid_x, centroid_y = self.basic_operations.calculate_centroid(route)
+                centroid_x, centroid_y = self.basic_operations.calculate_centroid_by_cities(route)
                 axes.scatter(
                     centroid_x,
                     centroid_y,
@@ -132,7 +132,9 @@ class Plotter:
             save_path: str | None = None,
             show_plot: bool = True,
             max_point: tuple[int, int] | None = None,
-            min_point: tuple[int, int] | None = None
+            min_point: tuple[int, int] | None = None,
+            fill : bool = True,
+            hypervolume : float = -1.0
     ):
         if individuals is None or len(individuals) == 0:
             raise ValueError("The list of individuals to plot cannot be empty.")
@@ -163,7 +165,7 @@ class Plotter:
         axes.set_xlabel("Total cost")
         axes.set_ylabel("Cost difference")
         axes.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)
-        axes.legend(loc="best")
+        axes.legend(loc="upper left")
         figure.tight_layout()
 
         if (max_point != None):
@@ -183,6 +185,29 @@ class Plotter:
                 zorder=3,
             )
 
+        if fill:
+            x_points.append(max_point[0])
+            y_points.append(max_point[1])
+            axes.fill(
+                x_points,
+                y_points,
+                hatch="\\",
+                alpha=0.1
+            )
+
+            if max_point is not None:
+                axes.annotate(
+                    f"Hypervolume: {hypervolume:.2f}",
+                    max_point,
+                    textcoords="offset points",
+                    xytext=(-10, 10),
+                    ha="right",
+                    va="bottom",
+                    fontsize=10,
+                    color="black",
+                    bbox=dict(boxstyle="round,pad=0.25", facecolor="white", alpha=0.8)
+                )
+            
         if save_path is not None:
             figure.savefig(save_path, dpi=200, bbox_inches="tight")
 

@@ -11,12 +11,25 @@ class Problem:
         self.nodes.remove(self.first_node)
         self.nodes_quantity = len(self.nodes)
         
-        self.nadir_point = {
-            "eil51": (1144, 515),
-            "berlin52": (18233, 10200),
-            "eil76": (0 , 0),
-            "rat99": (0 , 0),
+        # Pontos encontrados com maximo e minimo de 100 execucoes, alterados em 0.2
+        self.reference_points = {
+            "eil51": {
+                "max_point": (1144, 515),
+                "min_point": (414, 4)
+            },
+            "berlin52": {
+                "max_point": (21465, 10200),
+                "mix_point": (6592, 32)
+            },
+            "eil76": {
+                "max_point": (),
+                "mix_point": ()
+            },
+            "rat99": {
+                "max_point": (),
+                "mix_point": ()
+            },
         }
 
     def get_nadir_point(self):
-        return self.nadir_point[self.instance_name]
+        return self.reference_points[self.instance_name]["max_point"]
