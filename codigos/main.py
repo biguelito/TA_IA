@@ -7,7 +7,7 @@ from operators import Operators
 import time
 
 def test_rebalance_by_centroid():
-    problem = Problem("eil51", 7)
+    problem = Problem("eil51", 7, 1400)
     plotter = Plotter(problem)
 
     # previous_path = "31-8-26-7-43-24-23-48-27-32-11-38-16-9-49-5-37-17-4-47-12-46-51-6-14-25-18-13-41-40-19-42-44-15-45-33-10-39-30-34-50-2-29-21-20-35-36-3-28-22-8-16-21-26-32-41"
@@ -31,7 +31,7 @@ def find_nadir():
     # solver.find_near_nadir_point("berlin52_1", 100)
     # solver.find_near_nadir_point("berlin52_2", 100)
     solver.find_near_nadir_point("eil76_1", 100)
-    solver.find_near_nadir_point("eil76_2", 100)
+    # solver.find_near_nadir_point("eil76_2", 100)
     solver.find_near_nadir_point("rat99", 100)
     return
 

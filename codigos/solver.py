@@ -55,39 +55,36 @@ class Solver:
                          iterations : int,
                          salesman_quantity : int,
                          repetitions : int,
-                         save=True
-    ) -> tuple[float, list[Individual]]:
-        problem = Problem(instance, salesman_quantity)
+    ) -> Result:
+        problem = Problem(instance, salesman_quantity, iterations)
 
         momtsp = MOmTSP(problem,
                         population_size=population_size, 
                         mutation_probability=mutation_probability,
                         iterations=iterations)
         total_exec_time = timeit.timeit(lambda: momtsp.solve_repetitions(repetitions), number=1) 
-        solutions = momtsp.best_solutions 
-        
-        solver_result = Result(problem, solutions, iterations)
-        if (save):
-            solver_result.save_result(total_exec_time=total_exec_time,
-                iterations=iterations,
-                salesman_quantity=salesman_quantity)
-        solver_result.evaluate_pareto()
-        return total_exec_time, solutions
+        solutions = momtsp.best_solutions         
+        result = Result(problem, solutions, iterations, total_exec_time)
+
+        return result
     
     def solve(self, instance, save=True) -> tuple[float, list[Individual]]:
         iterations = self.__variations[instance]["iterations"]
         salesman_quantity = self.__variations[instance]["salesman_quantity"]
         instance_problem = self.__variations[instance]["problem"]
 
-        total_exec_time, solutions = self.__solve_instance(
+        result = self.__solve_instance(
             instance=instance_problem, 
             population_size=self.__population_size, 
             mutation_probability=self.__mutation_probability, 
             iterations=iterations, 
             salesman_quantity=salesman_quantity, 
-            repetitions=self.__repetitions, 
-            save=save)
-        return total_exec_time, solutions
+            repetitions=self.__repetitions)
+        
+        result.evaluate_pareto()
+        if (save):
+            result.save_result()
+        return result.total_exec_time, result.solutions
 
     def find_near_nadir_point(self, instance, loops):
         instance_problem = self.__variations[instance]["problem"]
@@ -118,7 +115,7 @@ class Solver:
             f.write(f"max point ({max_point[0]}, {max_point[1]})\n")
             f.write(f"min point ({min_point[0]}, {min_point[1]})")
 
-        problem = Problem(instance_problem, salesman_quantity)
+        problem = Problem(instance_problem, salesman_quantity, iterations)
         plotter = Plotter(problem)
         plotter.plot_pareto_front(solutions, save_path=f"{path}-pareto.png", show_plot=False,max_point=max_point, min_point=min_point)
         

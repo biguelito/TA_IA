@@ -139,9 +139,8 @@ class Plotter:
         if individuals is None or len(individuals) == 0:
             raise ValueError("The list of individuals to plot cannot be empty.")
 
-        sorted_individuals = sorted(individuals, key=lambda individual: individual.total_distance)
-        x_points = [individual.total_distance for individual in sorted_individuals]
-        y_points = [individual.difference_longest_shortest for individual in sorted_individuals]
+        x_points = [individual.total_distance for individual in individuals]
+        y_points = [individual.difference_longest_shortest for individual in individuals]
 
         figure, axes = plt.subplots(figsize=(10, 8))
         axes.scatter(
@@ -161,7 +160,7 @@ class Plotter:
             zorder=2
         )
 
-        axes.set_title(f"{individuals[0].problem.instance_name} - Pareto front - {len(sorted_individuals)} individuals")
+        axes.set_title(f"{individuals[0].problem.instance_name} - Pareto front - {len(individuals)} individuals")
         axes.set_xlabel("Total cost")
         axes.set_ylabel("Cost difference")
         axes.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)

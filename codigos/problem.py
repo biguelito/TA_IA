@@ -1,7 +1,10 @@
 import tsplib95
 
 class Problem:
-    def __init__(self, instance_name : str, salesman_quantity : int):
+    def __init__(self, 
+                 instance_name : str,
+                 salesman_quantity : int,
+                 iterations : int):
         self.instance_name = instance_name
         self.instance = tsplib95.load(f"problems/{instance_name}.tsp")
         self.salesman_quantity = salesman_quantity
@@ -10,7 +13,7 @@ class Problem:
         self.nodes = list(self.all_nodes)
         self.nodes.remove(self.first_node)
         self.nodes_quantity = len(self.nodes)
-        
+        self.iterations = iterations
         # Pontos encontrados com maximo e minimo de 100 execucoes, alterados em 0.2
         self.reference_points = {
             "eil51": {
@@ -19,17 +22,20 @@ class Problem:
             },
             "berlin52": {
                 "max_point": (21465, 10200),
-                "mix_point": (6592, 32)
+                "min_point": (6592, 32)
             },
             "eil76": {
                 "max_point": (),
-                "mix_point": ()
+                "min_point": ()
             },
             "rat99": {
                 "max_point": (),
-                "mix_point": ()
+                "min_point": ()
             },
         }
 
     def get_nadir_point(self):
         return self.reference_points[self.instance_name]["max_point"]
+
+    def get_min_point(self):
+        return self.reference_points[self.instance_name]["min_point"]
