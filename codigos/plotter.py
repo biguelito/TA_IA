@@ -134,7 +134,9 @@ class Plotter:
             max_point: tuple[int, int] | None = None,
             min_point: tuple[int, int] | None = None,
             fill : bool = True,
-            hypervolume : float = -1.0
+            hypervolume : float = -1.0,
+            spacing: float = -1.0,
+            spreading: float = -1.0
     ):
         if individuals is None or len(individuals) == 0:
             raise ValueError("The list of individuals to plot cannot be empty.")
@@ -149,7 +151,7 @@ class Plotter:
             color="royalblue",
             s=55,
             zorder=3,
-            label="Individuals"
+            # label="Individuals"
         )
         axes.plot(
             x_points,
@@ -164,7 +166,7 @@ class Plotter:
         axes.set_xlabel("Total cost")
         axes.set_ylabel("Cost difference")
         axes.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)
-        axes.legend(loc="upper left")
+        # axes.legend()
         figure.tight_layout()
 
         if (max_point != None):
@@ -194,18 +196,25 @@ class Plotter:
                 alpha=0.1
             )
 
-            if max_point is not None:
-                axes.annotate(
-                    f"Hypervolume: {hypervolume:.2f}",
-                    max_point,
-                    textcoords="offset points",
-                    xytext=(-10, 10),
-                    ha="right",
-                    va="bottom",
-                    fontsize=10,
-                    color="black",
-                    bbox=dict(boxstyle="round,pad=0.25", facecolor="white", alpha=0.8)
-                )
+        metrics = []
+        if hypervolume >= 0:
+            metrics.append(f"Hypervolume: {hypervolume:.2f}")
+        if spacing >= 0:
+            metrics.append(f"Spacing: {spacing:.4f}")
+        if spreading >= 0:
+            metrics.append(f"Spreading: {spreading:.4f}")
+
+        if len(metrics) > 0:
+            axes.text(
+                0.02,
+                0.98,
+                "\n".join(metrics),
+                transform=axes.transAxes,
+                ha="left",
+                va="top",
+                fontsize=10,
+                bbox=dict(boxstyle="round,pad=0.25", facecolor="white", alpha=0.8)
+            )
             
         if save_path is not None:
             figure.savefig(save_path, dpi=200, bbox_inches="tight")

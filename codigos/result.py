@@ -56,4 +56,7 @@ class Result:
             save_path=f"{self.path}-pareto.png",
             show_plot=True,
             max_point=nadir_point,
-            hypervolume=self.hypervolume)
+            min_point=min_point,
+            hypervolume=self.hypervolume,
+            spacing=self.spacing,
+            spreading=self.spreading)
