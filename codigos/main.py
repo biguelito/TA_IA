@@ -32,7 +32,7 @@ def find_nadir():
     # solver.find_near_nadir_point("berlin52_2", 100)
     solver.find_near_nadir_point("eil76_1", 100)
     # solver.find_near_nadir_point("eil76_2", 100)
-    solver.find_near_nadir_point("rat99", 100)
+    # solver.find_near_nadir_point("rat99", 100)
     return
 
 if __name__ == "__main__":
