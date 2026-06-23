@@ -168,6 +168,22 @@ class Operators:
 
         return childs
 
+    def mutation_inversion(self, individual: Individual) -> Individual:
+        pos_1 = random.randint(0, len(individual.paths)-2)
+        pos_2 = random.randint(pos_1, len(individual.paths)-1)
+        individual.paths = individual.paths[: pos_1] + list(reversed(individual.paths[pos_1 : pos_2])) + individual.paths[pos_2 :]
+        individual.divisions = individual.create_random_salesman_division()
+        individual.calculate_costs()
+        return individual
+
+    def mutation_transposition(self, individual: Individual) -> Individual:
+        pos_1 = random.randint(0, len(individual.paths)-2)
+        pos_2 = random.randint(pos_1, len(individual.paths)-1)
+        individual.paths = individual.paths[pos_1 : pos_2] + individual.paths[: pos_1] + individual.paths[pos_2 :]
+        individual.divisions = individual.create_random_salesman_division()
+        individual.calculate_costs()
+        return individual
+
     def rebalance_by_centroid(self, individual: Individual, mode: str) -> Individual:
         routes = copy.deepcopy(individual.salesman_paths)
 
@@ -175,7 +191,7 @@ class Operators:
             return individual
 
         costs = individual.total_per_salesman
-        centroids = [self.calculate_centroid(route) for route in routes]
+        centroids = [self.basic_operations.calculate_centroid_by_cities(route) for route in routes]
 
         if mode == "expand_shortest":
             destination_index = min(range(len(costs)), key=lambda index: costs[index])

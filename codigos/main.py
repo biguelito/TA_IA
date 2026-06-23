@@ -28,26 +28,15 @@ def test_rebalance_by_centroid():
 
 def find_nadir():
     solver = Solver()
-    # solver.find_near_nadir_point("eil51", 100)
-    # solver.find_near_nadir_point("berlin52_1", 100)
-    # solver.find_near_nadir_point("berlin52_2", 100)
-    solver.find_near_nadir_point("eil76_1", 100)
-    # solver.find_near_nadir_point("eil76_2", 100)
-    # solver.find_near_nadir_point("rat99", 100)
+    # solver.find_aproximate_nadir_point("eil51", 100)
+    # solver.find_aproximate_nadir_point("berlin52_1", 100)
+    # solver.find_aproximate_nadir_point("berlin52_2", 100)
+    solver.find_aproximate_nadir_point("eil76_1", 100)
+    # solver.find_aproximate_nadir_point("eil76_2", 100)
+    # solver.find_aproximate_nadir_point("rat99", 100)
     return
 
 if __name__ == "__main__":
-    # solver = Solver()
-    # solver.solve("eil76_1")
-
-    problem = Problem("eil76", 3, 1800)
-    plotter = Plotter(problem)
-    path = "6-2-30-74-28-62-73-33-63-23-56-43-41-42-64-22-61-21-47-36-69-71-60-70-20-37-5-48-29-15-57-13-54-19-14-59-66-11-65-38-53-35-7-8-46-34-52-27-45-4-67-26-76-75-68-16-49-24-18-50-25-55-31-10-58-72-39-9-32-3-44-12-40-17-51-26-51"
-    individual_solution = Individual(problem)
-    individual_solution.create_previous_chromossome(path)
-    plotter.plot_individual(individual_solution,
-                            show_centroids=True,
-                            save_path=f"solucoes/{(int(time.time()))}-path.png"
-    )
-
-    # find_nadir()
+    solver = Solver()
+    solver.solve("eil51")
+    solver.solve("eil51", rebalance_by_centroid=0.4)

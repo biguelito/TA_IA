@@ -41,7 +41,8 @@ class Plotter:
             individual: Individual,
             show_centroids: bool = False,
             save_path: str | None = None,
-            show_plot: bool = True
+            show_plot: bool = True,
+            used_centroid : bool = False
     ):
         if individual.salesman_paths is None or len(individual.salesman_paths) == 0:
             raise ValueError("The individual does not have decoded salesman paths to plot.")
@@ -107,7 +108,7 @@ class Plotter:
                 )
 
         axes.set_title(
-            f"{individual.problem.instance_name} - total distance: {individual.total_distance} - "
+            f"{individual.problem.instance_name}{" with centroid" if used_centroid else ""} - total distance: {individual.total_distance} - "
             f"difference: {individual.difference_longest_shortest}"
         )
         axes.set_xlabel("X")
@@ -177,7 +178,8 @@ class Plotter:
             fill : bool = True,
             hypervolume : float = -1.0,
             spacing: float = -1.0,
-            spreading: float = -1.0
+            spreading: float = -1.0,
+            used_centroid : bool = False
     ):
         if individuals is None or len(individuals) == 0:
             raise ValueError("The list of individuals to plot cannot be empty.")
@@ -202,7 +204,7 @@ class Plotter:
             zorder=2
         )
 
-        axes.set_title(f"{individuals[0].problem.instance_name} - Pareto front - {len(individuals)} individuals")
+        axes.set_title(f"{individuals[0].problem.instance_name}{" with centroid" if used_centroid else ""} - Pareto front - {len(individuals)} individuals")
         axes.set_xlabel("Total cost")
         axes.set_ylabel("Cost difference")
         axes.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)

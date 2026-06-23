@@ -55,20 +55,22 @@ class Solver:
                          iterations : int,
                          salesman_quantity : int,
                          repetitions : int,
+                         rebalance_by_centroid : float | None = None
     ) -> Result:
         problem = Problem(instance, salesman_quantity, iterations)
 
         momtsp = MOmTSP(problem,
                         population_size=population_size, 
                         mutation_probability=mutation_probability,
-                        iterations=iterations)
+                        iterations=iterations,
+                        rebalance_by_centroid=rebalance_by_centroid)
         total_exec_time = timeit.timeit(lambda: momtsp.solve_repetitions(repetitions), number=1) 
         solutions = momtsp.best_solutions         
-        result = Result(problem, solutions, iterations, total_exec_time)
+        result = Result(problem, solutions, iterations, total_exec_time, rebalance_by_centroid)
 
         return result
     
-    def solve(self, instance, save=True) -> tuple[float, list[Individual]]:
+    def solve(self, instance, save=True, rebalance_by_centroid : float | None = None) -> Result:
         iterations = self.__variations[instance]["iterations"]
         salesman_quantity = self.__variations[instance]["salesman_quantity"]
         instance_problem = self.__variations[instance]["problem"]
@@ -79,14 +81,15 @@ class Solver:
             mutation_probability=self.__mutation_probability, 
             iterations=iterations, 
             salesman_quantity=salesman_quantity, 
-            repetitions=self.__repetitions)
+            repetitions=self.__repetitions, 
+            rebalance_by_centroid=rebalance_by_centroid)
         
         result.evaluate_pareto()
         if (save):
             result.save_result()
         return result
 
-    def find_near_nadir_point(self, instance, loops):
+    def find_aproximate_nadir_point(self, instance, loops):
         instance_problem = self.__variations[instance]["problem"]
         iterations = self.__variations[instance]["iterations"]
         salesman_quantity = self.__variations[instance]["salesman_quantity"]

@@ -10,7 +10,8 @@ class MOmTSP:
             problem : Problem,
             population_size : int,
             mutation_probability : float,
-            iterations : int
+            iterations : int,
+            rebalance_by_centroid : float | None = None
     ):
         self.problem = problem        
         self.mutation_probability = mutation_probability
@@ -20,6 +21,11 @@ class MOmTSP:
         self.solutions_chromossome_for_filtering = set()
         self.unique_solutions = []
         self.ranked_unique_solutions = None
+
+        self.rebalance_by_centroid = rebalance_by_centroid
+        self.mutation_inversion_probability = (1-rebalance_by_centroid)/2 if rebalance_by_centroid else 0.5
+        self.mutation_transposition_probability = 1-rebalance_by_centroid if rebalance_by_centroid else None
+        return 
 
     def __save_unique_solutions(self, individuals):
         for individual in individuals:
@@ -36,6 +42,33 @@ class MOmTSP:
         for rank in ranks:
             self.nsga2.crowding_distance(rank)
         return
+    
+    def __mutation_without_centroid(self, child):
+        if (random.uniform(0, 1) <= self.mutation_inversion_probability): 
+            child = self.operators.mutation_inversion(child)
+        else:
+            child = self.operators.mutation_transposition(child)
+
+        return child
+
+    def __mutation_with_centroid(self, child):
+        probability = random.uniform(0, 1)
+        if (probability <= self.mutation_inversion_probability): 
+            child = self.operators.mutation_inversion(child)
+        elif (probability <= self.mutation_transposition_probability):
+            child = self.operators.mutation_transposition(child)
+        else:
+            child = self.operators.rebalance_by_centroid(child, "expand_shortest")
+        
+        return child
+
+    def __mutation(self, child):
+        if self.rebalance_by_centroid:
+            child = self.__mutation_with_centroid(child)
+        else:
+            child = self.__mutation_without_centroid(child)
+
+        return child
 
     def solve(self):
         self.__start_population()
@@ -45,10 +78,7 @@ class MOmTSP:
     
             for child in self.population.actual_childs:
                 if (random.uniform(0, 1) <= self.mutation_probability):
-                    if (random.uniform(0, 1) <= 0.5): 
-                        child.mutation_inversion()
-                    else:
-                        child.mutation_transposition()
+                    child = self.__mutation(child)
 
             population_ranked = self.nsga2.fast_non_dominated_sort(self.population.population_complete)
             

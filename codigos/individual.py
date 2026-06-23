@@ -18,7 +18,7 @@ class Individual:
         self.domination_count = 0
         self.dominated_solutions = []
 
-    def __create_random_salesman_division(self):
+    def create_random_salesman_division(self):
         division = []
         last_salesman = 0
         for div in range(self.problem.salesman_quantity-1):
@@ -27,7 +27,7 @@ class Individual:
             division.append(position)
         return division
 
-    def __calculate_costs(self):
+    def calculate_costs(self):
         self.total_per_salesman = []
         self.salesman_paths = []
         self.__separate_salemans()
@@ -59,40 +59,24 @@ class Individual:
 
     def create_random(self):
         self.paths = random.sample(self.problem.nodes, k=self.problem.nodes_quantity)
-        self.divisions = self.__create_random_salesman_division()
-        self.__calculate_costs()
+        self.divisions = self.create_random_salesman_division()
+        self.calculate_costs()
 
     def create_crossover(self, paths, divisions):
         self.paths = paths
         self.divisions = divisions
-        self.__calculate_costs()
+        self.calculate_costs()
 
     def create_crossover_random_divisions(self, paths):
         self.paths = paths
-        self.divisions = self.__create_random_salesman_division()
-        self.__calculate_costs()
+        self.divisions = self.create_random_salesman_division()
+        self.calculate_costs()
 
     def create_previous_chromossome(self, chromossome : str):
         chromossome_list = [int(chro) for chro in chromossome.split("-")]
         self.paths = chromossome_list[:-(self.problem.salesman_quantity-1)]
         self.divisions = chromossome_list[-(self.problem.salesman_quantity-1):]
-        self.__calculate_costs()
-
-    def mutation_inversion(self):
-        pos_1 = random.randint(0, len(self.paths)-2)
-        pos_2 = random.randint(pos_1, len(self.paths)-1)
-        self.paths = self.paths[: pos_1] + list(reversed(self.paths[pos_1 : pos_2])) + self.paths[pos_2 :]
-        self.divisions = self.__create_random_salesman_division()
-        self.__calculate_costs()
-        return 
-
-    def mutation_transposition(self):
-        pos_1 = random.randint(0, len(self.paths)-2)
-        pos_2 = random.randint(pos_1, len(self.paths)-1)
-        self.paths = self.paths[pos_1 : pos_2] + self.paths[: pos_1] + self.paths[pos_2 :]
-        self.divisions = self.__create_random_salesman_division()
-        self.__calculate_costs()
-        return
+        self.calculate_costs()
         
     @property    
     def chromossome(self):
