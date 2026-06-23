@@ -38,5 +38,8 @@ def find_nadir():
 
 if __name__ == "__main__":
     solver = Solver()
-    solver.solve("eil51")
-    solver.solve("eil51", rebalance_by_centroid=0.4)
+    result_a = solver.solve("eil51")
+    result_b = solver.solve("eil51", rebalance_by_centroid=0.8)
+
+    comparison = solver.compare_pareto_metrics(result_a, result_b)
+    print(comparison)

@@ -4,6 +4,7 @@ from individual import Individual
 from plotter import Plotter
 from result import Result
 
+import json
 import timeit
 import time
 
@@ -88,6 +89,63 @@ class Solver:
         if (save):
             result.save_result()
         return result
+
+    def compare_pareto_metrics(self, result_a: Result, result_b: Result, save : bool = True) -> dict:
+        if result_a.problem.instance_name != result_b.problem.instance_name:
+            raise ValueError("Pareto fronts must belong to the same problem instance for comparison.")
+        if result_a.problem.salesman_quantity != result_b.problem.salesman_quantity:
+            raise ValueError("Pareto fronts must use the same number of salesmen for comparison.")
+
+        if result_a.hypervolume == 0 and result_a.spacing == 0 and result_a.spreading == 0:
+            result_a.evaluate_pareto()
+        if result_b.hypervolume == 0 and result_b.spacing == 0 and result_b.spreading == 0:
+            result_b.evaluate_pareto()
+
+        def better(metric_name: str, value_a: float, value_b: float) -> str:
+            if value_a == value_b:
+                return "tie"
+
+            if metric_name == "hypervolume":
+                return "result_a" if value_a > value_b else "result_b"
+            if metric_name == "spacing":
+                return "result_a" if value_a < value_b else "result_b"
+            if metric_name == "spreading":
+                return "result_a" if value_a < value_b else "result_b"
+
+        comparison = {
+            "problem": result_a.problem.instance_name,
+            "salesman_quantity": result_a.problem.salesman_quantity,
+            "result_a": {
+                "hypervolume": result_a.hypervolume,
+                "spacing": result_a.spacing,
+                "spreading": result_a.spreading,
+            },
+            "result_b": {
+                "hypervolume": result_b.hypervolume,
+                "spacing": result_b.spacing,
+                "spreading": result_b.spreading,
+            },
+            "better": {
+                "hypervolume": better("hypervolume", result_a.hypervolume, result_b.hypervolume),
+                "spacing": better("spacing", result_a.spacing, result_b.spacing),
+                "spreading": better("spreading", result_a.spreading, result_b.spreading),
+            }
+        }
+
+        score_a = sum(1 for winner in comparison["better"].values() if winner == "result_a")
+        score_b = sum(1 for winner in comparison["better"].values() if winner == "result_b")
+
+        if score_a == score_b:
+            comparison["overall"] = "tie"
+        else:
+            comparison["overall"] = "result_a" if score_a > score_b else "result_b"
+
+        if save:
+            moment = str(int(time.time()))
+            with open(f"./solucoes/{moment}-comparison.json", "w") as f:
+                json.dump(comparison, f, indent=4)
+
+        return comparison
 
     def find_aproximate_nadir_point(self, instance, loops):
         instance_problem = self.__variations[instance]["problem"]

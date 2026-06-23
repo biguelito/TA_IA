@@ -28,7 +28,9 @@ class Result:
         self.used_centroid = rebalance_by_centroid != None
         return
     
-    def save_result(self, show_individual : bool = False):
+    def save_result(self, 
+                    show_individual : bool = False,
+                    show_pareto : bool = False):
         with open(f"{self.path}-solucoes.txt", "w") as f:
             f.write(f"{self.problem.instance_name}{" with centroid" if self.used_centroid else ""} - {self.problem.iterations} - {self.problem.salesman_quantity} - {self.total_exec_time}:\n")
             for s in self.solutions:
@@ -40,12 +42,23 @@ class Result:
 
         solution = random.sample(self.solutions, k=1)[0]
         self.plotter.plot_individual(solution, show_centroids=True, save_path=f"{self.path}-individual.png", show_plot=show_individual, used_centroid=self.used_centroid)
+        
+        nadir_point = self.problem.get_nadir_point()
+        min_point = self.problem.get_min_point()
+        self.plotter.plot_pareto_front(self.solutions, 
+            save_path=f"{self.path}-pareto.png",
+            show_plot=show_pareto,
+            max_point=nadir_point,
+            min_point=min_point,
+            hypervolume=self.hypervolume,
+            spacing=self.spacing,
+            spreading=self.spreading,
+            used_centroid=self.used_centroid)
 
         return
     
-    def evaluate_pareto(self, show_plot : bool = False):
+    def evaluate_pareto(self):
         nadir_point = self.problem.get_nadir_point()
-        min_point = self.problem.get_min_point()
         vertices = [(solution.total_distance, solution.difference_longest_shortest) for solution in self.solutions]
         polygon_vertices = list(vertices)
         polygon_vertices.append(nadir_point)
@@ -53,13 +66,3 @@ class Result:
         self.hypervolume = polygon.area
         self.spacing = self.basic_operations.calculate_spacing(vertices)
         self.spreading = self.basic_operations.calculate_spreading(vertices)
-
-        self.plotter.plot_pareto_front(self.solutions, 
-            save_path=f"{self.path}-pareto.png",
-            show_plot=show_plot,
-            max_point=nadir_point,
-            min_point=min_point,
-            hypervolume=self.hypervolume,
-            spacing=self.spacing,
-            spreading=self.spreading,
-            used_centroid=self.used_centroid)
