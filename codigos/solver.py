@@ -85,7 +85,7 @@ class Solver:
             repetitions=self.__repetitions, 
             rebalance_by_centroid=rebalance_by_centroid)
         
-        result.evaluate_pareto()
+        result.evaluate_result()
         if (save):
             result.save_result()
         return result
@@ -97,9 +97,9 @@ class Solver:
             raise ValueError("Pareto fronts must use the same number of salesmen for comparison.")
 
         if result_a.hypervolume == 0 and result_a.spacing == 0 and result_a.spreading == 0:
-            result_a.evaluate_pareto()
+            result_a.evaluate_result()
         if result_b.hypervolume == 0 and result_b.spacing == 0 and result_b.spreading == 0:
-            result_b.evaluate_pareto()
+            result_b.evaluate_result()
 
         def better(metric_name: str, value_a: float, value_b: float) -> str:
             if value_a == value_b:
@@ -115,15 +115,18 @@ class Solver:
         comparison = {
             "problem": result_a.problem.instance_name,
             "salesman_quantity": result_a.problem.salesman_quantity,
+            "iterations": result_a.problem.iterations,
             "result_a": {
                 "hypervolume": result_a.hypervolume,
                 "spacing": result_a.spacing,
                 "spreading": result_a.spreading,
+                "rebalance_by_centroid": result_a.rebalance_by_centroid
             },
             "result_b": {
                 "hypervolume": result_b.hypervolume,
                 "spacing": result_b.spacing,
                 "spreading": result_b.spreading,
+                "rebalance_by_centroid": result_b.rebalance_by_centroid
             },
             "better": {
                 "hypervolume": better("hypervolume", result_a.hypervolume, result_b.hypervolume),

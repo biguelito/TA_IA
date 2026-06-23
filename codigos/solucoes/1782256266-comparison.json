@@ -1,0 +1,23 @@
+{
+    "problem": "eil51",
+    "salesman_quantity": 7,
+    "iterations": 1400,
+    "result_a": {
+        "hypervolume": 115924.5,
+        "spacing": 9.145151804938406,
+        "spreading": 0.8240269957403121,
+        "rebalance_by_centroid": null
+    },
+    "result_b": {
+        "hypervolume": 146589.5,
+        "spacing": 5.410383358836831,
+        "spreading": 0.8976440391075627,
+        "rebalance_by_centroid": 0.8
+    },
+    "better": {
+        "hypervolume": "result_b",
+        "spacing": "result_b",
+        "spreading": "result_a"
+    },
+    "overall": "result_b"
+}

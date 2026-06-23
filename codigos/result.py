@@ -25,6 +25,7 @@ class Result:
         self.hypervolume = 0
         self.spacing = 0
         self.spreading = 0
+        self.rebalance_by_centroid = rebalance_by_centroid
         self.used_centroid = rebalance_by_centroid != None
         return
     
@@ -57,7 +58,7 @@ class Result:
 
         return
     
-    def evaluate_pareto(self):
+    def evaluate_result(self):
         nadir_point = self.problem.get_nadir_point()
         vertices = [(solution.total_distance, solution.difference_longest_shortest) for solution in self.solutions]
         polygon_vertices = list(vertices)
