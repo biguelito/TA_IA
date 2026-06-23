@@ -18,19 +18,19 @@ class Problem:
         self.reference_points = {
             "eil51": {
                 "max_point": (1144, 515),
-                "min_point": (414, 4)
+                "min_point": (414, 0)
             },
             "berlin52": {
                 "max_point": (21465, 10200),
-                "min_point": (6592, 32)
+                "min_point": (6592, 0)
             },
             "eil76": {
-                "max_point": (),
-                "min_point": ()
+                "max_point": (1361, 698),
+                "min_point": (508, 0)
             },
             "rat99": {
-                "max_point": (),
-                "min_point": ()
+                "max_point": (4238, 1757),
+                "min_point": (1233, 0)
             },
         }
 

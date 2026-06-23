@@ -84,7 +84,7 @@ class Solver:
         result.evaluate_pareto()
         if (save):
             result.save_result()
-        return result.total_exec_time, result.solutions
+        return result
 
     def find_near_nadir_point(self, instance, loops):
         instance_problem = self.__variations[instance]["problem"]
@@ -95,9 +95,16 @@ class Solver:
         solutions = []
         total_time = 0
         for i in range(loops):
-            total_exec_time, solutions_loop = self.solve(instance, save=False)
-            solutions += solutions_loop
-            total_time += total_exec_time
+            result = self.__solve_instance(
+                instance=instance_problem, 
+                population_size=self.__population_size, 
+                mutation_probability=self.__mutation_probability, 
+                iterations=iterations, 
+                salesman_quantity=salesman_quantity, 
+                repetitions=self.__repetitions)
+            
+            solutions += result.solutions
+            total_time += result.total_exec_time
             print(f"completado {i}")
 
         extreme_solutions = [indv for indv in solutions if indv.crowding_distance == float("inf")]
