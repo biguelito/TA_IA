@@ -1,0 +1,97 @@
+{
+    "instance_variation": "eil51",
+    "problem": "eil51",
+    "salesman_quantity": 7,
+    "iterations": 1400,
+    "selected_rebalance_by_centroid": 0.2,
+    "decision_rule": {
+        "median_difference_win_rate_threshold": 0.6,
+        "best_total_distance_relative_degradation_threshold": 0.05,
+        "requirements": [
+            "centroid wins at least 60.0% of runs on median difference",
+            "centroid improves median difference",
+            "centroid improves best difference",
+            "median hypervolume is not worse",
+            "median best total distance degradation is lower than 5.0%"
+        ]
+    },
+    "checks": {
+        "median_difference": {
+            "baseline_median": 90.25,
+            "centroid_median": 80.5,
+            "centroid_win_rate": 0.6,
+            "threshold": 0.6,
+            "passes": true
+        },
+        "best_difference": {
+            "baseline_median": 21.0,
+            "centroid_median": 18.0,
+            "delta_median": -2.0,
+            "passes": true
+        },
+        "hypervolume": {
+            "baseline_median": 167686.5,
+            "centroid_median": 143346.25,
+            "delta_median": -19577.5,
+            "passes": false
+        },
+        "best_total_distance": {
+            "baseline_median": 545.0,
+            "centroid_median": 548.5,
+            "delta_median": 3.0,
+            "relative_degradation": 0.006422018348623854,
+            "threshold": 0.05,
+            "passes": true
+        }
+    },
+    "secondary_metrics": {
+        "mean_difference_delta_median": -10.18937162959218,
+        "median_total_distance_delta_median": 20.75,
+        "spacing_delta_median": -2.5851479330314615,
+        "spreading_delta_median": 0.018557275837838005,
+        "win_counts": {
+            "best_total_distance": {
+                "baseline": 11,
+                "centroid": 6,
+                "tie": 3
+            },
+            "median_total_distance": {
+                "baseline": 13,
+                "centroid": 5,
+                "tie": 2
+            },
+            "best_difference": {
+                "baseline": 8,
+                "centroid": 11,
+                "tie": 1
+            },
+            "median_difference": {
+                "baseline": 8,
+                "centroid": 12,
+                "tie": 0
+            },
+            "mean_difference": {
+                "baseline": 7,
+                "centroid": 13,
+                "tie": 0
+            },
+            "hypervolume": {
+                "baseline": 12,
+                "centroid": 8,
+                "tie": 0
+            },
+            "spacing": {
+                "baseline": 7,
+                "centroid": 13,
+                "tie": 0
+            },
+            "spreading": {
+                "baseline": 16,
+                "centroid": 4,
+                "tie": 0
+            }
+        }
+    },
+    "centroid_promising": false,
+    "verdict": "Centroid does not satisfy the protocol decision rule for a clear improvement in the second objective."
+}
