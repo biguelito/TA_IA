@@ -14,23 +14,23 @@ class Problem:
         self.nodes.remove(self.first_node)
         self.nodes_quantity = len(self.nodes)
         self.iterations = iterations
-        # Pontos encontrados com maximo e minimo de 100 execucoes, alterados em 0.2
+        # Pontos encontrados com maximo e minimo de 100 execucoes, alterados em 0.3
         self.reference_points = {
             "eil51": {
-                "max_point": (1144, 515),
-                "min_point": (414, 0)
+                "max_point": (1239, 558),
+                "min_point": (362, 0)
             },
             "berlin52": {
-                "max_point": (21465, 10200),
-                "min_point": (6592, 0)
+                "max_point": (23254, 11050),
+                "min_point": (5768, 0)
             },
             "eil76": {
-                "max_point": (1361, 698),
-                "min_point": (508, 0)
+                "max_point": (1475, 908),
+                "min_point": (355, 0)
             },
             "rat99": {
-                "max_point": (4238, 1757),
-                "min_point": (1233, 0)
+                "max_point": (4591, 1904),
+                "min_point": (1079, 0)
             },
         }
 

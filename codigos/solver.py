@@ -92,9 +92,9 @@ class Solver:
             result.save_result()
         return result
 
-    def __solve_with_seed(self, instance: str, seed: int, rebalance_by_centroid: float | None = None) -> Result:
+    def __solve_with_seed(self, instance: str, seed: int, rebalance_by_centroid: float | None = None, save_solve: bool = False) -> Result:
         random.seed(seed)
-        return self.solve(instance, save=False, rebalance_by_centroid=rebalance_by_centroid)
+        return self.solve(instance, save=save_solve, rebalance_by_centroid=rebalance_by_centroid)
 
     def __get_result_metrics(self, result: Result) -> dict:
         if len(result.execution_metrics) == 0:
@@ -276,26 +276,27 @@ class Solver:
             screening_values: list[float] | None = None,
             screening_runs: int = 10,
             base_seed: int = 42,
-            save: bool = True
+            save: bool = True,
+            save_solve: bool = True
     ) -> dict:
         if instance not in self.__variations:
             raise ValueError(f"Unknown instance variation '{instance}'.")
 
         if screening_values is None:
-            screening_values = [0.05, 0.10, 0.20, 0.30, 0.50, 0.80, 1]
+            screening_values = [0.10, 0.20, 0.30, 0.50, 0.80, 1]
 
         variation = self.__variations[instance]
         screening_seeds = [base_seed + i for i in range(screening_runs)]
 
         screening_baseline_results = {
-            seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=None)
+            seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=None, save_solve=save_solve)
             for seed in screening_seeds
         }
 
         screening_results = []
         for centroid_value in screening_values:
             centroid_results = {
-                seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=centroid_value)
+                seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=centroid_value, save_solve=save_solve)
                 for seed in screening_seeds
             }
             run_records = [
@@ -337,7 +338,8 @@ class Solver:
             selected_rebalance_by_centroid: float | None = None,
             final_runs: int = 30,
             base_seed: int = 42,
-            save: bool = True
+            save: bool = True,
+            save_solve: bool = True
     ) -> dict:
         if instance not in self.__variations:
             raise ValueError(f"Unknown instance variation '{instance}'.")
@@ -348,11 +350,11 @@ class Solver:
         final_seeds = [base_seed + i for i in range(final_runs)]
 
         final_baseline_results = {
-            seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=None)
+            seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=None, save_solve=save_solve)
             for seed in final_seeds
         }
         final_centroid_results = {
-            seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=selected_rebalance_by_centroid)
+            seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=selected_rebalance_by_centroid, save_solve=save_solve)
             for seed in final_seeds
         }
         final_run_records = [
@@ -380,32 +382,42 @@ class Solver:
 
         return final_comparison
 
-    def run_centroid_experimental(
+    def run_centroid_experiment(
             self,
             instance: str = "eil51",
             screening_values: list[float] | None = None,
             screening_runs: int = 10,
-            final_runs: int = 30,
+            final_runs: int = 20,
             base_seed: int = 42,
-            save: bool = True
+            save: bool = True,
+            save_screening: bool = False,
+            save_screening_solve: bool = False,
+            save_final_comparison: bool = False,
+            save_final_comparison_solve: bool = False,
+            save_all: bool = False
     ) -> dict:
+        if save_all:
+            save_screening, save_screening_solve, save_final_comparison, save_final_comparison_solve = True, True, True, True
+
         screening = self.run_centroid_screening(
             instance=instance,
             screening_values=screening_values,
             screening_runs=screening_runs,
             base_seed=base_seed,
-            save=False
+            save=save_screening,
+            save_solve=save_screening_solve
         )
         final_comparison = self.run_centroid_final_comparison(
             instance=instance,
             selected_rebalance_by_centroid=screening["selected_rebalance_by_centroid"],
             final_runs=final_runs,
             base_seed=base_seed + screening_runs,
-            save=False
+            save=save_final_comparison,
+            save_solve=save_final_comparison_solve
         )
 
         variation = self.__variations[instance]
-        protocol = {
+        experiment = {
             "instance_variation": instance,
             "problem": variation["problem"],
             "salesman_quantity": variation["salesman_quantity"],
@@ -415,9 +427,9 @@ class Solver:
         }
 
         if save:
-            self.__save_json_file(protocol, f"{instance}-protocol")
+            self.__save_json_file(experiment, f"{instance}-experiment")
 
-        return protocol
+        return experiment
 
     def find_aproximate_nadir_point(self, instance, loops):
         instance_problem = self.__variations[instance]["problem"]

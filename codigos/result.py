@@ -25,25 +25,22 @@ class Result:
         self.basic_operations = BasicOperations(problem)
         self.execution_metrics = {}
         self.rebalance_by_centroid = rebalance_by_centroid
-        self.used_centroid = rebalance_by_centroid != None
         return
     
     def save_result(self, 
                     show_individual : bool = False,
                     show_pareto : bool = False):
         with open(f"{self.path}-solucoes.txt", "w") as f:
-            f.write(f"{self.problem.instance_name}{" with centroid" if self.used_centroid else ""} - {self.problem.iterations} - {self.problem.salesman_quantity} - {self.total_exec_time}:\n")
+            f.write(f"{self.problem.instance_name}{f" with centroid {self.rebalance_by_centroid}" if self.rebalance_by_centroid else ""} - {self.problem.iterations} - {self.problem.salesman_quantity} - {self.total_exec_time}:\n")
             for s in self.solutions:
                 f.write(f"{s.id}: {s}\n")
 
-            f.write(f"hypervolume: {self.hypervolume}\n")
-            f.write(f"spacing: {self.spacing}\n")
-            f.write(f"spreading: {self.spreading}\n")
             for metric_name, metric_value in self.execution_metrics.items():
                 f.write(f"{metric_name}: {metric_value}\n")
-
+            f.write(f"rebalance_by_centroid: {self.rebalance_by_centroid}\n")
+            
         solution = random.sample(self.solutions, k=1)[0]
-        self.plotter.plot_individual(solution, show_centroids=True, save_path=f"{self.path}-individual.png", show_plot=show_individual, used_centroid=self.used_centroid)
+        self.plotter.plot_individual(solution, show_centroids=True, save_path=f"{self.path}-individual.png", show_plot=show_individual, rebalance_by_centroid=self.rebalance_by_centroid)
         
         nadir_point = self.problem.get_nadir_point()
         min_point = self.problem.get_min_point()
@@ -55,7 +52,7 @@ class Result:
             hypervolume=self.execution_metrics["hypervolume"],
             spacing=self.execution_metrics["spacing"],
             spreading=self.execution_metrics["spreading"],
-            used_centroid=self.used_centroid)
+            rebalance_by_centroid=self.rebalance_by_centroid)
 
         return
     
