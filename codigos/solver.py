@@ -9,6 +9,7 @@ import random
 import statistics
 import timeit
 import time
+from pathlib import Path
 
 class Solver:
     def __init__(self):    
@@ -58,7 +59,8 @@ class Solver:
                          iterations : int,
                          salesman_quantity : int,
                          repetitions : int,
-                         rebalance_by_centroid : float | None = None
+                         rebalance_by_centroid : float | None = None,
+                         output_dir: str | None = None
     ) -> Result:
         problem = Problem(instance, salesman_quantity, iterations)
 
@@ -69,11 +71,11 @@ class Solver:
                         rebalance_by_centroid=rebalance_by_centroid)
         total_exec_time = timeit.timeit(lambda: momtsp.solve_repetitions(repetitions), number=1) 
         solutions = momtsp.best_solutions         
-        result = Result(problem, solutions, iterations, total_exec_time, rebalance_by_centroid)
+        result = Result(problem, solutions, iterations, total_exec_time, rebalance_by_centroid, output_dir)
 
         return result
     
-    def solve(self, instance, save=True, rebalance_by_centroid : float | None = None) -> Result:
+    def solve(self, instance, save=True, rebalance_by_centroid : float | None = None, output_dir: str | None = None) -> Result:
         iterations = self.__variations[instance]["iterations"]
         salesman_quantity = self.__variations[instance]["salesman_quantity"]
         instance_problem = self.__variations[instance]["problem"]
@@ -85,16 +87,24 @@ class Solver:
             iterations=iterations, 
             salesman_quantity=salesman_quantity, 
             repetitions=self.__repetitions, 
-            rebalance_by_centroid=rebalance_by_centroid)
+            rebalance_by_centroid=rebalance_by_centroid,
+            output_dir=output_dir)
         
         result.evaluate_result()
         if (save):
             result.save_result()
         return result
 
-    def __solve_with_seed(self, instance: str, seed: int, rebalance_by_centroid: float | None = None, save_solve: bool = False) -> Result:
+    def __solve_with_seed(
+            self,
+            instance: str,
+            seed: int,
+            rebalance_by_centroid: float | None = None,
+            save_solve: bool = False,
+            output_dir: str | None = None
+    ) -> Result:
         random.seed(seed)
-        return self.solve(instance, save=save_solve, rebalance_by_centroid=rebalance_by_centroid)
+        return self.solve(instance, save=save_solve, rebalance_by_centroid=rebalance_by_centroid, output_dir=output_dir)
 
     def __get_result_metrics(self, result: Result) -> dict:
         if len(result.execution_metrics) == 0:
@@ -207,12 +217,20 @@ class Solver:
             )
         )
 
-    def __save_json_file(self, data: dict, file_suffix: str):
+    def __save_json_file(self, data: dict, file_suffix: str, output_dir: str | None = None):
         moment = str(int(time.time()))
-        with open(f"./solucoes/{moment}-{file_suffix}.json", "w") as f:
+        save_dir = Path(output_dir or "./solucoes")
+        save_dir.mkdir(parents=True, exist_ok=True)
+        with open(save_dir / f"{moment}-{file_suffix}.json", "w") as f:
             json.dump(data, f, indent=4)
 
-    def compare_pareto_metrics(self, result_a: Result, result_b: Result, save : bool = True) -> dict:
+    def compare_pareto_metrics(
+            self,
+            result_a: Result,
+            result_b: Result,
+            save : bool = True,
+            output_dir: str | None = None
+    ) -> dict:
         if result_a.problem.instance_name != result_b.problem.instance_name:
             raise ValueError("Pareto fronts must belong to the same problem instance for comparison.")
         if result_a.problem.salesman_quantity != result_b.problem.salesman_quantity:
@@ -266,7 +284,7 @@ class Solver:
             comparison["overall"] = "result_a" if score_a > score_b else "result_b"
 
         if save:
-            self.__save_json_file(comparison, "comparison")
+            self.__save_json_file(comparison, "comparison", output_dir)
 
         return comparison
 
@@ -277,7 +295,8 @@ class Solver:
             screening_runs: int = 10,
             base_seed: int = 42,
             save: bool = True,
-            save_solve: bool = True
+            save_solve: bool = True,
+            output_dir: str | None = None
     ) -> dict:
         if instance not in self.__variations:
             raise ValueError(f"Unknown instance variation '{instance}'.")
@@ -289,14 +308,26 @@ class Solver:
         screening_seeds = [base_seed + i for i in range(screening_runs)]
 
         screening_baseline_results = {
-            seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=None, save_solve=save_solve)
+            seed: self.__solve_with_seed(
+                instance,
+                seed,
+                rebalance_by_centroid=None,
+                save_solve=save_solve,
+                output_dir=output_dir
+            )
             for seed in screening_seeds
         }
 
         screening_results = []
         for centroid_value in screening_values:
             centroid_results = {
-                seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=centroid_value, save_solve=save_solve)
+                seed: self.__solve_with_seed(
+                    instance,
+                    seed,
+                    rebalance_by_centroid=centroid_value,
+                    save_solve=save_solve,
+                    output_dir=output_dir
+                )
                 for seed in screening_seeds
             }
             run_records = [
@@ -328,7 +359,7 @@ class Solver:
         }
 
         if save:
-            self.__save_json_file(screening, f"{instance}-screening")
+            self.__save_json_file(screening, f"{instance}-screening", output_dir)
 
         return screening
 
@@ -339,7 +370,8 @@ class Solver:
             final_runs: int = 30,
             base_seed: int = 42,
             save: bool = True,
-            save_solve: bool = True
+            save_solve: bool = True,
+            output_dir: str | None = None
     ) -> dict:
         if instance not in self.__variations:
             raise ValueError(f"Unknown instance variation '{instance}'.")
@@ -350,11 +382,23 @@ class Solver:
         final_seeds = [base_seed + i for i in range(final_runs)]
 
         final_baseline_results = {
-            seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=None, save_solve=save_solve)
+            seed: self.__solve_with_seed(
+                instance,
+                seed,
+                rebalance_by_centroid=None,
+                save_solve=save_solve,
+                output_dir=output_dir
+            )
             for seed in final_seeds
         }
         final_centroid_results = {
-            seed: self.__solve_with_seed(instance, seed, rebalance_by_centroid=selected_rebalance_by_centroid, save_solve=save_solve)
+            seed: self.__solve_with_seed(
+                instance,
+                seed,
+                rebalance_by_centroid=selected_rebalance_by_centroid,
+                save_solve=save_solve,
+                output_dir=output_dir
+            )
             for seed in final_seeds
         }
         final_run_records = [
@@ -378,7 +422,7 @@ class Solver:
         }
 
         if save:
-            self.__save_json_file(final_comparison, f"{instance}-final-comparison")
+            self.__save_json_file(final_comparison, f"{instance}-final-comparison", output_dir)
 
         return final_comparison
 
@@ -394,7 +438,8 @@ class Solver:
             save_screening_solve: bool = False,
             save_final_comparison: bool = False,
             save_final_comparison_solve: bool = False,
-            save_all: bool = False
+            save_all: bool = False,
+            output_dir: str | None = None
     ) -> dict:
         if save_all:
             save_screening, save_screening_solve, save_final_comparison, save_final_comparison_solve = True, True, True, True
@@ -405,7 +450,8 @@ class Solver:
             screening_runs=screening_runs,
             base_seed=base_seed,
             save=save_screening,
-            save_solve=save_screening_solve
+            save_solve=save_screening_solve,
+            output_dir=output_dir
         )
         final_comparison = self.run_centroid_final_comparison(
             instance=instance,
@@ -413,7 +459,8 @@ class Solver:
             final_runs=final_runs,
             base_seed=base_seed + screening_runs,
             save=save_final_comparison,
-            save_solve=save_final_comparison_solve
+            save_solve=save_final_comparison_solve,
+            output_dir=output_dir
         )
 
         variation = self.__variations[instance]
@@ -427,7 +474,7 @@ class Solver:
         }
 
         if save:
-            self.__save_json_file(experiment, f"{instance}-experiment")
+            self.__save_json_file(experiment, f"{instance}-experiment", output_dir)
 
         return experiment
 
@@ -436,7 +483,8 @@ class Solver:
             experiment_or_path: dict | str,
             median_difference_win_rate_threshold: float = 0.6,
             best_total_distance_relative_degradation_threshold: float = 0.05,
-            save: bool = True
+            save: bool = True,
+            output_dir: str | None = None
     ) -> dict:
         if isinstance(experiment_or_path, str):
             with open(experiment_or_path, "r") as f:
@@ -553,9 +601,104 @@ class Solver:
         }
 
         if save:
-            self.__save_json_file(result, f"{experiment["instance_variation"]}-analysis")
+            self.__save_json_file(result, f"{experiment['instance_variation']}-analysis", output_dir)
 
         return result
+
+    def run_complete_centroid_experiment(
+            self,
+            instance_variations: list[str],
+            screening_values: list[float] = [0.10, 0.20, 0.30, 0.50, 0.80, 1],
+            screening_runs: int = 10,
+            final_runs: int = 20,
+            base_seed: int = 42,
+            save: bool = True,
+            save_experiment: bool = False,
+            save_analysis: bool = False,
+            save_screening: bool = False,
+            save_screening_solve: bool = False,
+            save_final_comparison: bool = False,
+            save_final_comparison_solve: bool = False,
+            save_all: bool = False,
+            median_difference_win_rate_threshold: float = 0.6,
+            best_total_distance_relative_degradation_threshold: float = 0.05,
+            output_base_dir: str = "./solucoes"
+    ) -> dict:
+        if save_all:
+            save = True
+            save_experiment = True
+            save_analysis = True
+            save_screening = True
+            save_screening_solve = True
+            save_final_comparison = True
+            save_final_comparison_solve = True
+
+        run_started = str(int(time.time()))
+        output_dir = Path(output_base_dir) / f"{run_started}-full_run"
+        output_dir.mkdir(parents=True, exist_ok=False)
+        output_dir_text = str(output_dir)
+
+        full_run = {
+            "run_started": run_started,
+            "output_dir": output_dir_text,
+            "instance_variations": instance_variations,
+            "parameters": {
+                "screening_values": screening_values,
+                "screening_runs": screening_runs,
+                "final_runs": final_runs,
+                "base_seed": base_seed,
+                "median_difference_win_rate_threshold": median_difference_win_rate_threshold,
+                "best_total_distance_relative_degradation_threshold": best_total_distance_relative_degradation_threshold,
+                "save": save,
+                "save_experiment": save_experiment,
+                "save_analysis": save_analysis,
+                "save_screening": save_screening,
+                "save_screening_solve": save_screening_solve,
+                "save_final_comparison": save_final_comparison,
+                "save_final_comparison_solve": save_final_comparison_solve,
+                "save_all": save_all,
+            },
+            "results": {}
+        }
+
+        seed_window = screening_runs + final_runs + 1000
+        for index, instance in enumerate(instance_variations):
+            if instance not in self.__variations:
+                raise ValueError(f"Unknown instance variation '{instance}'.")
+
+            instance_base_seed = base_seed + (index * seed_window)
+            experiment = self.run_centroid_experiment(
+                instance=instance,
+                screening_values=screening_values,
+                screening_runs=screening_runs,
+                final_runs=final_runs,
+                base_seed=instance_base_seed,
+                save=save_experiment,
+                save_screening=save_screening,
+                save_screening_solve=save_screening_solve,
+                save_final_comparison=save_final_comparison,
+                save_final_comparison_solve=save_final_comparison_solve,
+                save_all=False,
+                output_dir=output_dir_text
+            )
+            analysis = self.analyze_centroid_experiment(
+                experiment,
+                median_difference_win_rate_threshold=median_difference_win_rate_threshold,
+                best_total_distance_relative_degradation_threshold=best_total_distance_relative_degradation_threshold,
+                save=save_analysis,
+                output_dir=output_dir_text
+            )
+
+            full_run["results"][instance] = {
+                "base_seed": instance_base_seed,
+                "experiment": experiment,
+                "analysis": analysis,
+            }
+
+        if save:
+            self.__save_json_file(full_run, "full_run", output_dir_text)
+
+        return full_run
 
     def find_aproximate_nadir_point(self, instance, loops):
         instance_problem = self.__variations[instance]["problem"]
