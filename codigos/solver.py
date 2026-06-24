@@ -431,6 +431,132 @@ class Solver:
 
         return experiment
 
+    def analyze_centroid_experiment(
+            self,
+            experiment_or_path: dict | str,
+            median_difference_win_rate_threshold: float = 0.6,
+            best_total_distance_relative_degradation_threshold: float = 0.05,
+            save: bool = True
+    ) -> dict:
+        if isinstance(experiment_or_path, str):
+            with open(experiment_or_path, "r") as f:
+                experiment = json.load(f)
+        else:
+            experiment = experiment_or_path
+
+        if "final_comparison" not in experiment:
+            raise ValueError("The provided experiment data must contain a 'final_comparison' section.")
+
+        final_comparison = experiment["final_comparison"]
+        final_results = final_comparison["results"]
+        summary = final_results["summary"]
+        wins = summary["wins"]
+        baseline_summary = summary["baseline"]
+        centroid_summary = summary["centroid"]
+        delta_summary = summary["delta"]
+
+        run_count = final_comparison["runs"]
+        median_difference_win_rate = wins["median_difference"]["centroid"] / run_count
+        median_difference_improved = (
+            centroid_summary["median_difference"]["median"] < baseline_summary["median_difference"]["median"]
+        )
+        best_difference_improved = (
+            centroid_summary["best_difference"]["median"] < baseline_summary["best_difference"]["median"]
+        )
+        hypervolume_not_worse = (
+            centroid_summary["hypervolume"]["median"] >= baseline_summary["hypervolume"]["median"]
+        )
+
+        baseline_best_total_distance = baseline_summary["best_total_distance"]["median"]
+        centroid_best_total_distance = centroid_summary["best_total_distance"]["median"]
+        best_total_distance_relative_degradation = 0.0
+        if baseline_best_total_distance != 0:
+            best_total_distance_relative_degradation = (
+                centroid_best_total_distance - baseline_best_total_distance
+            ) / baseline_best_total_distance
+
+        best_total_distance_degradation_small = (
+            best_total_distance_relative_degradation <= best_total_distance_relative_degradation_threshold
+        )
+
+        centroid_promising = (
+            median_difference_win_rate >= median_difference_win_rate_threshold
+            and median_difference_improved
+            and best_difference_improved
+            and hypervolume_not_worse
+            and best_total_distance_degradation_small
+        )
+
+        checks = {
+            "median_difference": {
+                "baseline_median": baseline_summary["median_difference"]["median"],
+                "centroid_median": centroid_summary["median_difference"]["median"],
+                "centroid_win_rate": median_difference_win_rate,
+                "threshold": median_difference_win_rate_threshold,
+                "passes": median_difference_win_rate >= median_difference_win_rate_threshold and median_difference_improved,
+            },
+            "best_difference": {
+                "baseline_median": baseline_summary["best_difference"]["median"],
+                "centroid_median": centroid_summary["best_difference"]["median"],
+                "delta_median": delta_summary["best_difference"]["median"],
+                "passes": best_difference_improved,
+            },
+            "hypervolume": {
+                "baseline_median": baseline_summary["hypervolume"]["median"],
+                "centroid_median": centroid_summary["hypervolume"]["median"],
+                "delta_median": delta_summary["hypervolume"]["median"],
+                "passes": hypervolume_not_worse,
+            },
+            "best_total_distance": {
+                "baseline_median": baseline_best_total_distance,
+                "centroid_median": centroid_best_total_distance,
+                "delta_median": delta_summary["best_total_distance"]["median"],
+                "relative_degradation": best_total_distance_relative_degradation,
+                "threshold": best_total_distance_relative_degradation_threshold,
+                "passes": best_total_distance_degradation_small,
+            },
+        }
+
+        if centroid_promising:
+            verdict = "Centroid appears promising for improving the second objective under the protocol decision rule."
+        else:
+            verdict = "Centroid does not satisfy the protocol decision rule for a clear improvement in the second objective."
+
+
+        result = {
+            "instance_variation": experiment["instance_variation"],
+            "problem": experiment["problem"],
+            "salesman_quantity": experiment["salesman_quantity"],
+            "iterations": experiment["iterations"],
+            "selected_rebalance_by_centroid": experiment["screening"]["selected_rebalance_by_centroid"],
+            "decision_rule": {
+                "median_difference_win_rate_threshold": median_difference_win_rate_threshold,
+                "best_total_distance_relative_degradation_threshold": best_total_distance_relative_degradation_threshold,
+                "requirements": [
+                    f"centroid wins at least {median_difference_win_rate_threshold * 100}% of runs on median difference",
+                    "centroid improves median difference",
+                    "centroid improves best difference",
+                    "median hypervolume is not worse",
+                    f"median best total distance degradation is lower than {best_total_distance_relative_degradation_threshold * 100}%",
+                ],
+            },
+            "checks": checks,
+            "secondary_metrics": {
+                "mean_difference_delta_median": delta_summary["mean_difference"]["median"],
+                "median_total_distance_delta_median": delta_summary["median_total_distance"]["median"],
+                "spacing_delta_median": delta_summary["spacing"]["median"],
+                "spreading_delta_median": delta_summary["spreading"]["median"],
+                "win_counts": wins,
+            },
+            "centroid_promising": centroid_promising,
+            "verdict": verdict,
+        }
+
+        if save:
+            self.__save_json_file(result, f"{experiment["instance_variation"]}-analysis")
+
+        return result
+
     def find_aproximate_nadir_point(self, instance, loops):
         instance_problem = self.__variations[instance]["problem"]
         iterations = self.__variations[instance]["iterations"]
