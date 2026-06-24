@@ -6,6 +6,7 @@ from basic_operations import BasicOperations
 import random
 import statistics
 import time
+from pathlib import Path
 from shapely.geometry import Polygon
 
 class Result:
@@ -14,12 +15,15 @@ class Result:
                  solutions : list[Individual],
                  iterations : int,
                  total_exec_time : float,
-                 rebalance_by_centroid : float | None = None):
+                 rebalance_by_centroid : float | None = None,
+                 output_dir: str | None = None):
         self.problem = problem
         self.solutions = sorted(solutions, key=lambda individual: (individual.total_distance, individual.difference_longest_shortest))
         self.plotter = Plotter(problem)
         moment = str(int(time.time()))
-        self.path = f"./solucoes/{moment}-{self.problem.instance_name}-{iterations}-{self.problem.salesman_quantity}"
+        self.output_dir = output_dir or "./solucoes"
+        Path(self.output_dir).mkdir(parents=True, exist_ok=True)
+        self.path = str(Path(self.output_dir) / f"{moment}-{self.problem.instance_name}-{iterations}-{self.problem.salesman_quantity}")
         self.total_exec_time = total_exec_time
 
         self.basic_operations = BasicOperations(problem)
