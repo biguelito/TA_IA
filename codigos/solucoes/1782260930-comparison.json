@@ -3,15 +3,15 @@
     "salesman_quantity": 7,
     "iterations": 1400,
     "result_a": {
-        "hypervolume": 115924.5,
-        "spacing": 9.145151804938406,
-        "spreading": 0.8240269957403121,
+        "hypervolume": 138277.0,
+        "spacing": 26.329512037454208,
+        "spreading": 0.869134709350247,
         "rebalance_by_centroid": null
     },
     "result_b": {
-        "hypervolume": 146589.5,
-        "spacing": 5.410383358836831,
-        "spreading": 0.8976440391075627,
+        "hypervolume": 164113.0,
+        "spacing": 7.252793877917195,
+        "spreading": 0.8902914990591347,
         "rebalance_by_centroid": 0.8
     },
     "better": {

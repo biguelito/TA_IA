@@ -4,6 +4,7 @@ from plotter import Plotter
 from basic_operations import BasicOperations
 
 import random
+import statistics
 import time
 from shapely.geometry import Polygon
 
@@ -22,9 +23,7 @@ class Result:
         self.total_exec_time = total_exec_time
 
         self.basic_operations = BasicOperations(problem)
-        self.hypervolume = 0
-        self.spacing = 0
-        self.spreading = 0
+        self.execution_metrics = {}
         self.rebalance_by_centroid = rebalance_by_centroid
         self.used_centroid = rebalance_by_centroid != None
         return
@@ -40,6 +39,8 @@ class Result:
             f.write(f"hypervolume: {self.hypervolume}\n")
             f.write(f"spacing: {self.spacing}\n")
             f.write(f"spreading: {self.spreading}\n")
+            for metric_name, metric_value in self.execution_metrics.items():
+                f.write(f"{metric_name}: {metric_value}\n")
 
         solution = random.sample(self.solutions, k=1)[0]
         self.plotter.plot_individual(solution, show_centroids=True, save_path=f"{self.path}-individual.png", show_plot=show_individual, used_centroid=self.used_centroid)
@@ -51,9 +52,9 @@ class Result:
             show_plot=show_pareto,
             max_point=nadir_point,
             min_point=min_point,
-            hypervolume=self.hypervolume,
-            spacing=self.spacing,
-            spreading=self.spreading,
+            hypervolume=self.execution_metrics["hypervolume"],
+            spacing=self.execution_metrics["spacing"],
+            spreading=self.execution_metrics["spreading"],
             used_centroid=self.used_centroid)
 
         return
@@ -64,6 +65,20 @@ class Result:
         polygon_vertices = list(vertices)
         polygon_vertices.append(nadir_point)
         polygon = Polygon(polygon_vertices) 
-        self.hypervolume = polygon.area
-        self.spacing = self.basic_operations.calculate_spacing(vertices)
-        self.spreading = self.basic_operations.calculate_spreading(vertices)
+
+        total_distances = [solution.total_distance for solution in self.solutions]
+        total_differences = [solution.difference_longest_shortest for solution in self.solutions]
+
+        self.execution_metrics = {
+            "front_size": len(self.solutions),
+            "best_total_distance": min(total_distances),
+            "median_total_distance": statistics.median(total_distances),
+            "mean_total_distance": statistics.fmean(total_distances),
+            "best_difference": min(total_differences),
+            "median_difference": statistics.median(total_differences),
+            "mean_difference": statistics.fmean(total_differences),
+            "hypervolume": polygon.area,
+            "spacing": self.basic_operations.calculate_spacing(vertices),
+            "spreading": self.basic_operations.calculate_spreading(vertices),
+            "total_exec_time": self.total_exec_time,
+        }
