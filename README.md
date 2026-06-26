@@ -32,6 +32,17 @@ Execute o experimento principal:
 python codigos/main.py
 ```
 
+Por padrão, o experimento completo executa as seguintes variações:
+
+| Variação | Problema TSPLIB | Caixeiros | Iterações |
+|---|---|---:|---:|
+| `eil51` | `eil51` | 7 | 1400 |
+| `berlin52_1` | `berlin52` | 5 | 1400 |
+| `berlin52_2` | `berlin52` | 7 | 1400 |
+| `eil76_1` | `eil76` | 3 | 1800 |
+| `eil76_2` | `eil76` | 7 | 1800 |
+| `rat99` | `rat99` | 7 | 2200 |
+
 Os resultados são salvos em `codigos/solucoes`, incluindo arquivos de experimentos, análises, soluções e gráficos.
 
 ## Métricas Avaliadas
